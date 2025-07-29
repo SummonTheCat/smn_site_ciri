@@ -1,0 +1,20 @@
+header {
+    background-color: var(--color-accent-02);
+    box-shadow: var(--shadow-generic);
+    padding: var(--buffer-small) var(--buffer-medium);
+}
+
+.msg-box {
+    max-width: 300px;
+    height: 350px;
+    margin: auto;
+    padding: var(--buffer-medium);
+    background-color: var(--color-accent-02);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--color-accent-01);
+    box-shadow: var(--shadow-generic);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}

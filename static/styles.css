@@ -1,0 +1,243 @@
+:root {
+    /* Color Palette */
+    --color-primary-01: #ffffff; 
+    --color-primary-02: #a0acf9;
+    --color-primary-03: #f0aeae;
+    --color-primary-04: #ffffff;
+    --color-secondary-01: #E0E0E0; 
+    --color-secondary-02: #7c88c6;
+    --color-secondary-03: #f0baae;
+    --color-secondary-04: #808080;
+    --color-accent-01: #242424;
+    --color-accent-02: #131313;
+    --color-accent-03: #0f0f0f;
+    --color-status-success: #416b41;
+    --color-status-error: #7c3535;
+
+    /* Text */
+    --font-family: "DM Sans", sans-serif;
+    --font-size-base: 16px;
+    --font-size-small: 1em;
+    --font-size-medium: 1.2em;
+    --font-size-large: 1.4em;
+
+    /* Layout */
+    --content-width-max: 1000px;
+    --buffer-tiny: 0.25em;
+    --buffer-small: 0.5em;
+    --buffer-medium: 1em;
+    --buffer-large: 2em;
+    --header-height: 60px;
+    --border-radius: 8px;
+    --border-width: 2px;
+
+    /* Misc */
+    --shadow-generic: 0 0 10px rgba(0, 0, 0, 0.05);
+
+    /* Transition */
+    --transition-speed: 0.2s;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+    background-color: var(--color-accent-03);
+    font-family: var(--font-family);
+    color: var(--color-primary-01);
+    font-size: var(--font-size-base);
+}
+
+/* Header Styling */
+
+
+.nav-buttons {
+    display: flex;
+    gap: var(--buffer-medium);
+    height: var(--header-height);
+    align-items: center;
+}   
+
+.nav-buttons .button {
+    text-align: center;
+    transition: var(--transition-speed);
+    border-radius: 3px;
+    padding: var(--buffer-tiny) var(--buffer-tiny);
+    cursor: pointer;
+    display: inline-block;
+    text-decoration: underline dotted;
+    align-content: center;
+    height: 60%;
+}
+
+.nav-buttons .button:hover {
+    background-color: var(--color-primary-04);
+    color: var(--color-accent-03);
+    padding: var(--buffer-tiny) var(--buffer-medium);
+}
+
+
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-family: "Funnel Display", sans-serif;
+}
+
+h1, h2 {
+    color: var(--color-primary-02);
+}
+
+h1 {
+    font-size: var(--font-size-large);
+}
+
+h2 {
+    font-size: var(--font-size-medium);
+}
+
+a {
+    color: var(--color-primary-01);
+    text-decoration: dotted underline;
+    transition: color var(--transition-speed);
+    cursor: pointer;
+}
+a:hover {
+    color: var(--color-primary-02);
+}
+
+
+/* Form Styles */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--buffer-medium);
+    margin: var(--buffer-medium) auto;
+    padding: var(--buffer-medium);
+    background-color: var(--color-accent-01);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-generic);
+}
+
+form label {
+    font-size: var(--font-size-small);
+    font-weight: bold;
+    color: var(--color-primary-01);
+}
+
+form input[type="text"],.container-main
+form input[type="password"] {
+    width: 100%;
+    padding: var(--buffer-small);
+    font-size: var(--font-size-base);
+    color: var(--color-primary-01);
+    background-color: var(--color-accent-02);
+    border: 1px solid var(--color-secondary-02);
+    border-radius: var(--border-radius);
+    transition: border-color var(--transition-speed);
+}
+
+form input[type="text"]:focus,
+form input[type="password"]:focus {
+    border-color: var(--color-primary-02);
+    outline: none;
+}
+
+form input[type="submit"] {
+    color: var(--color-primary-01);
+    background-color: var(--color-accent-02);
+    padding: var(--buffer-small) var(--buffer-medium);
+    text-decoration: none;
+    transition: background-color var(--transition-speed);
+    font-size: var(--font-size-small);
+    font-weight: bold;
+    border: var(--color-secondary-02) var(--border-width) solid;
+    border-radius: var(--border-radius);
+}
+
+form input[type="submit"]:hover {
+    background-color: var(--color-accent-03);
+}
+
+/* Form Messages */
+.hidden {
+    display: none;
+}
+
+#error, .success {
+    font-size: var(--font-size-small);
+    margin-top: var(--buffer-small);
+    padding: var(--buffer-small);
+    border-radius: var(--border-radius);
+}
+
+.error {
+    color: var(--color-accent-03);
+    background-color: var(--color-status-error);
+}
+
+.success {
+    color: var(--color-primary-01);
+    background-color: var(--color-status-success);
+}
+
+/* Link Styling */
+form p a {
+    font-size: var(--font-size-small);
+    color: var(--color-primary-02);
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+
+form p a:hover {
+    color: var(--color-primary-01);
+}
+
+/* Flex Centering for Content */
+.flex-center {
+    display: flex;
+    justify-content: center !important; 
+    align-items: center !important;
+    flex-wrap: wrap;
+}
+
+.flex-grow {
+    flex: 1;
+}
+
+/* Flex Row */
+.flex-row {
+    display: flex;
+    width: 100%;
+}
+
+/* Text Center */
+.text-center {
+    text-align: center;
+}
+
+.space-small {
+    width: var(--buffer-small);
+    height: var(--buffer-small);
+}
+
+.space-medium {
+    width: var(--buffer-medium);
+    height: var(--buffer-medium);
+}
+
+.space-large {
+    width: var(--buffer-large);
+    height: var(--buffer-large);
+}
