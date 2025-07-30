@@ -17,7 +17,7 @@ mod sys_auth {
 
 #[tokio::main]
 async fn main() {
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
     let base_url = format!("http://{}", addr);
 
     // ensure dirs exist
