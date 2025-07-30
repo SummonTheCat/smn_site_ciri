@@ -1,62 +1,82 @@
-use axum::{
-    body::Bytes,
-    http::{HeaderMap, StatusCode},
-    http::header::CONTENT_TYPE,
-    response::IntoResponse,
-    routing::get,
-    Router,
-};
-use once_cell::sync::Lazy;
-use std::{fs, net::SocketAddr};
-use tower::ServiceBuilder;
-use tower_http::services::ServeDir;
-use tower_http::trace::TraceLayer;
+use hyper::service::{make_service_fn, service_fn};
+use hyper::{Body, Method, Request, Response, Server};
+use std::{convert::Infallible, net::SocketAddr};
 
-// ─── Cache index.html (with graceful fallback) ─────────────────────────────────
-static INDEX_HTML: Lazy<Bytes> = Lazy::new(|| {
-    match fs::read("res/index.html") {
-        Ok(data) => Bytes::from(data),
-        Err(err) => {
-            // log the real I/O error to stderr
-            eprintln!("Error loading res/index.html: {}", err);
-            // return a minimal 500 page
-            Bytes::from(
-                "<!DOCTYPE html>\
-                 <html><head><title>500</title></head>\
-                 <body><h1>500 Internal Server Error</h1>\
-                 <p>Unable to load index page.</p></body></html>"
-            )
-        }
-    }
-});
+mod sys_fileapi {
+    pub mod core;
+    pub mod handlers;
+}
+mod sys_statichost {
+    pub mod core;
+    pub mod handlers;
+}
+mod sys_auth {
+    pub mod core;
+    pub mod handlers;
+}
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new()
-        .route("/", get(index))
-        .route("/helloworld", get(hello_world))
-        .fallback_service(
-            ServiceBuilder::new()
-                .layer(TraceLayer::new_for_http())
-                .service(ServeDir::new("static")),
-        );
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let base_url = format!("http://{}", addr);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8000));
+    // ensure dirs exist
+    tokio::fs::create_dir_all("static").await.unwrap();
+    tokio::fs::create_dir_all("uploads").await.unwrap();
+
+    let make_svc = make_service_fn(move |_| {
+        let base_url = base_url.clone();
+        async move {
+            Ok::<_, Infallible>(service_fn(move |req| router(req, base_url.clone())))
+        }
+    });
+
     println!("Listening on http://{}", addr);
-    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    Server::bind(&addr).serve(make_svc).await.unwrap();
 }
 
-// GET /
-async fn index() -> impl IntoResponse {
-    let mut headers = HeaderMap::new();
-    headers.insert(CONTENT_TYPE, "text/html".parse().unwrap());
+async fn router(req: Request<Body>, base_url: String) -> Result<Response<Body>, Infallible> {
+    let method = req.method().clone();
+    let uri = req.uri().path();
 
-    // Always returns something—even if we fell back to the 500 page.
-    (headers, INDEX_HTML.clone())
-}
+    // 0) Protect only upload and delete
+    let is_protected = 
+        (uri == "/api/upload" && method == Method::POST) ||
+        (method == Method::DELETE && uri.starts_with("/api/files/"));
 
-// GET /helloworld
-async fn hello_world() -> impl IntoResponse {
-    (StatusCode::OK, "Hello, world!\n")
+    if is_protected {
+        if let Some(unauth) = sys_auth::handlers::handler_auth(&req).await {
+            return Ok(unauth);
+        }
+    }
+
+    // 1) API endpoints
+    if uri == "/api/upload" && method == Method::POST {
+        return Ok(sys_fileapi::handlers::handler_upload(req, &base_url).await);
+    }
+    if uri == "/api/files" && method == Method::GET {
+        // public: list files
+        return Ok(sys_fileapi::handlers::handler_list().await);
+    }
+    if method == Method::DELETE && uri.starts_with("/api/files/") {
+        let filename = &uri["/api/files/".len()..];
+        return Ok(sys_fileapi::handlers::handler_remove(filename).await);
+    }
+
+    // 2) Static UI
+    if let Some(resp) = sys_statichost::handlers::handler_static(uri).await {
+        return Ok(resp);
+    }
+
+    // 3) File downloads (public)
+    if method == Method::GET && uri.starts_with("/files/") {
+        let filename = &uri["/files/".len()..];
+        return Ok(sys_fileapi::handlers::handler_download(filename).await);
+    }
+
+    // 4) 404 fallback
+    Ok(Response::builder()
+        .status(404)
+        .body(Body::from("Not found"))
+        .unwrap())
 }

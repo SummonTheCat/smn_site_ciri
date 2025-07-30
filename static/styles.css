@@ -10,7 +10,7 @@
     --color-secondary-04: #808080;
     --color-accent-01: #242424;
     --color-accent-02: #131313;
-    --color-accent-03: #0f0f0f;
+    --color-accent-03: #000000;
     --color-status-success: #416b41;
     --color-status-error: #7c3535;
 
@@ -36,6 +36,9 @@
 
     /* Transition */
     --transition-speed: 0.2s;
+
+    /* Sizes */
+    --size-panel-left: 300px;
 }
 
 * {
@@ -117,6 +120,25 @@ a:hover {
     color: var(--color-primary-02);
 }
 
+button {
+    color: var(--color-primary-02);
+    background-color: var(--color-accent-02);
+    padding: var(--buffer-small) var(--buffer-medium);
+    text-decoration: none;
+    transition: background-color var(--transition-speed);
+    font-weight: bold;
+    border: var(--color-secondary-02) var(--border-width) solid;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition-speed);
+}
+
+button:hover {
+    background-color: var(--color-primary-02);
+    color: var(--color-accent-02);
+    border: var(--color-accent-02) var(--border-width) solid;
+}
+
 
 /* Form Styles */
 form {
@@ -155,20 +177,71 @@ form input[type="password"]:focus {
 }
 
 form input[type="submit"] {
-    color: var(--color-primary-01);
+    color: var(--color-primary-02);
     background-color: var(--color-accent-02);
     padding: var(--buffer-small) var(--buffer-medium);
     text-decoration: none;
     transition: background-color var(--transition-speed);
-    font-size: var(--font-size-small);
     font-weight: bold;
     border: var(--color-secondary-02) var(--border-width) solid;
     border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition-speed);
 }
 
 form input[type="submit"]:hover {
-    background-color: var(--color-accent-03);
+    background-color: var(--color-primary-02);
+    color: var(--color-accent-02);
+    border: var(--color-accent-02) var(--border-width) solid;
 }
+
+input[type="file"]::file-selector-button {
+  /* match your other form buttons */
+  color: var(--color-primary-02);
+  background-color: var(--color-accent-02);
+  padding: var(--buffer-small) var(--buffer-medium);
+  border: var(--color-secondary-02) var(--border-width) solid;
+  border-radius: var(--border-radius);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: var(--color-primary-02);
+  color: var(--color-accent-02);
+  border-color: var(--color-accent-02);
+}
+
+/* WebKit fallback for older browsers */
+input[type="file"]::-webkit-file-upload-button {
+  /* same styles as above */
+  color: var(--color-primary-02);
+  background-color: var(--color-accent-02);
+  padding: var(--buffer-small) var(--buffer-medium);
+  border: var(--color-secondary-02) var(--border-width) solid;
+  border-radius: var(--border-radius);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+  background-color: var(--color-primary-02);
+  color: var(--color-accent-02);
+  border-color: var(--color-accent-02);
+}
+form input[type="file"] {
+    background-color: var(--color-accent-02);
+    padding: var(--buffer-small) var(--buffer-small);
+    text-decoration: none;
+    transition: background-color var(--transition-speed);
+    border: var(--color-secondary-02) var(--border-width) solid;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition-speed);
+}
+
 
 /* Form Messages */
 .hidden {
@@ -210,6 +283,11 @@ form p a:hover {
     justify-content: center !important; 
     align-items: center !important;
     flex-wrap: wrap;
+}
+
+.flex-center-vertical {
+    display: flex;
+    align-items: center !important;
 }
 
 .flex-grow {
