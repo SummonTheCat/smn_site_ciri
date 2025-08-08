@@ -11,8 +11,8 @@
     --color-accent-01: #242424;
     --color-accent-02: #131313;
     --color-accent-03: #000000;
-    --color-status-success: #416b41;
-    --color-status-error: #7c3535;
+    --color-status-success: #78e878;
+    --color-status-error: #b44a4a;
 
     /* Text */
     --font-family: "DM Sans", sans-serif;
@@ -131,11 +131,17 @@ button {
     border-radius: var(--border-radius);
     cursor: pointer;
     transition: var(--transition-speed);
+    font-family: var(--font-family);
 }
 
 button:hover {
     background-color: var(--color-primary-02);
     color: var(--color-accent-02);
+    border: var(--color-accent-02) var(--border-width) solid;
+}
+
+button:active {
+    background-color: var(--color-primary-03);
     border: var(--color-accent-02) var(--border-width) solid;
 }
 
@@ -158,25 +164,26 @@ form label {
     color: var(--color-primary-01);
 }
 
-form input[type="text"],.container-main
-form input[type="password"] {
+input[type="text"],
+input[type="password"] {
     width: 100%;
     padding: var(--buffer-small);
     font-size: var(--font-size-base);
-    color: var(--color-primary-01);
+    color: var(--color-secondary-02);
     background-color: var(--color-accent-02);
-    border: 1px solid var(--color-secondary-02);
+    border: 2px solid var(--color-secondary-02);
     border-radius: var(--border-radius);
     transition: border-color var(--transition-speed);
 }
 
-form input[type="text"]:focus,
-form input[type="password"]:focus {
-    border-color: var(--color-primary-02);
+input[type="text"]:focus,
+input[type="password"]:focus {
     outline: none;
+    border: 2px solid var(--color-secondary-03);
+    color: var(--color-primary-03);
 }
 
-form input[type="submit"] {
+input[type="submit"] {
     color: var(--color-primary-02);
     background-color: var(--color-accent-02);
     padding: var(--buffer-small) var(--buffer-medium);
@@ -189,7 +196,7 @@ form input[type="submit"] {
     transition: var(--transition-speed);
 }
 
-form input[type="submit"]:hover {
+input[type="submit"]:hover {
     background-color: var(--color-primary-02);
     color: var(--color-accent-02);
     border: var(--color-accent-02) var(--border-width) solid;
