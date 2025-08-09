@@ -1,25 +1,26 @@
 :root {
     /* Color Palette */
-    --color-primary-01: #ffffff; 
+    --color-primary-01: #ffffff;
     --color-primary-02: #a0acf9;
     --color-primary-03: #f0aeae;
     --color-primary-04: #ffffff;
-    --color-secondary-01: #E0E0E0; 
+    --color-secondary-01: #E0E0E0;
     --color-secondary-02: #7c88c6;
     --color-secondary-03: #f0baae;
     --color-secondary-04: #808080;
     --color-accent-01: #242424;
     --color-accent-02: #131313;
-    --color-accent-03: #000000;
+    --color-accent-03: #0d0d11;
     --color-status-success: #78e878;
     --color-status-error: #b44a4a;
 
     /* Text */
-    --font-family: "DM Sans", sans-serif;
+    --font-family: "Funnel Display", sans-serif;
+    --font-family-heading: "Lexend", sans-serif;
     --font-size-base: 16px;
-    --font-size-small: 1em;
+    --font-size-small: 0.9em;
     --font-size-medium: 1.2em;
-    --font-size-large: 1.4em;
+    --font-size-large: 1.5em;
 
     /* Layout */
     --content-width-max: 1000px;
@@ -47,7 +48,8 @@
     padding: 0;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
     padding: 0;
@@ -56,7 +58,8 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Full viewport height */
+    height: 100vh;
+    /* Full viewport height */
     background-color: var(--color-accent-03);
     font-family: var(--font-family);
     color: var(--color-primary-01);
@@ -66,39 +69,20 @@ body {
 /* Header Styling */
 
 
-.nav-buttons {
-    display: flex;
-    gap: var(--buffer-medium);
-    height: var(--header-height);
-    align-items: center;
-}   
-
-.nav-buttons .button {
-    text-align: center;
-    transition: var(--transition-speed);
-    border-radius: 3px;
-    padding: var(--buffer-tiny) var(--buffer-tiny);
-    cursor: pointer;
-    display: inline-block;
-    text-decoration: underline dotted;
-    align-content: center;
-    height: 60%;
-}
-
-.nav-buttons .button:hover {
-    background-color: var(--color-primary-04);
-    color: var(--color-accent-03);
-    padding: var(--buffer-tiny) var(--buffer-medium);
-}
 
 
-
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     margin: 0;
-    font-family: "Funnel Display", sans-serif;
+    font-family: var(--font-family-heading);
 }
 
-h1, h2 {
+h1,
+h2 {
     color: var(--color-primary-02);
 }
 
@@ -115,9 +99,16 @@ a {
     text-decoration: dotted underline;
     transition: color var(--transition-speed);
     cursor: pointer;
+
+    user-select: none;
 }
+
 a:hover {
     color: var(--color-primary-02);
+}
+
+a:active {
+    color: var(--color-primary-03);
 }
 
 button {
@@ -203,41 +194,42 @@ input[type="submit"]:hover {
 }
 
 input[type="file"]::file-selector-button {
-  /* match your other form buttons */
-  color: var(--color-primary-02);
-  background-color: var(--color-accent-02);
-  padding: var(--buffer-small) var(--buffer-medium);
-  border: var(--color-secondary-02) var(--border-width) solid;
-  border-radius: var(--border-radius);
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color var(--transition-speed), color var(--transition-speed);
+    /* match your other form buttons */
+    color: var(--color-primary-02);
+    background-color: var(--color-accent-02);
+    padding: var(--buffer-small) var(--buffer-medium);
+    border: var(--color-secondary-02) var(--border-width) solid;
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
 }
 
 input[type="file"]::file-selector-button:hover {
-  background-color: var(--color-primary-02);
-  color: var(--color-accent-02);
-  border-color: var(--color-accent-02);
+    background-color: var(--color-primary-02);
+    color: var(--color-accent-02);
+    border-color: var(--color-accent-02);
 }
 
 /* WebKit fallback for older browsers */
 input[type="file"]::-webkit-file-upload-button {
-  /* same styles as above */
-  color: var(--color-primary-02);
-  background-color: var(--color-accent-02);
-  padding: var(--buffer-small) var(--buffer-medium);
-  border: var(--color-secondary-02) var(--border-width) solid;
-  border-radius: var(--border-radius);
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color var(--transition-speed), color var(--transition-speed);
+    /* same styles as above */
+    color: var(--color-primary-02);
+    background-color: var(--color-accent-02);
+    padding: var(--buffer-small) var(--buffer-medium);
+    border: var(--color-secondary-02) var(--border-width) solid;
+    border-radius: var(--border-radius);
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
 }
 
 input[type="file"]::-webkit-file-upload-button:hover {
-  background-color: var(--color-primary-02);
-  color: var(--color-accent-02);
-  border-color: var(--color-accent-02);
+    background-color: var(--color-primary-02);
+    color: var(--color-accent-02);
+    border-color: var(--color-accent-02);
 }
+
 form input[type="file"] {
     background-color: var(--color-accent-02);
     padding: var(--buffer-small) var(--buffer-small);
@@ -255,7 +247,8 @@ form input[type="file"] {
     display: none;
 }
 
-#error, .success {
+#error,
+.success {
     font-size: var(--font-size-small);
     margin-top: var(--buffer-small);
     padding: var(--buffer-small);
@@ -287,7 +280,7 @@ form p a:hover {
 /* Flex Centering for Content */
 .flex-center {
     display: flex;
-    justify-content: center !important; 
+    justify-content: center !important;
     align-items: center !important;
     flex-wrap: wrap;
 }
@@ -295,6 +288,11 @@ form p a:hover {
 .flex-center-vertical {
     display: flex;
     align-items: center !important;
+}
+
+.flex-center-horizontal {
+    display: flex;
+    justify-content: center !important;
 }
 
 .flex-grow {
@@ -312,6 +310,12 @@ form p a:hover {
     text-align: center;
 }
 
+.text-justify {
+    text-align: justify;
+    text-justify: inter-word;
+    
+}
+
 .space-small {
     width: var(--buffer-small);
     height: var(--buffer-small);
@@ -325,4 +329,48 @@ form p a:hover {
 .space-large {
     width: var(--buffer-large);
     height: var(--buffer-large);
+}
+
+/* Miscellaneous */
+
+/* Make the image cover the entire viewport and sit behind content */
+/* Make the image cover the full viewport width and sit behind content */
+.fullscreen {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    /* always scale to viewport width */
+    height: auto;
+    /* preserve aspect ratio */
+    min-height: 100vh;
+    /* ensure it fills tall viewports */
+    object-fit: cover;
+    /* still crops if height > viewport */
+    object-position: center;
+    pointer-events: none;
+    z-index: -1;
+}
+
+
+/* Apply a soft blur (scale slightly to hide edge bleed from blur) */
+.blur-01 {
+    --blur-radius: 30px;
+    /* tweak to taste */
+    filter: blur(var(--blur-radius));
+    transform: scale(1.05);
+    will-change: transform, filter;
+}
+
+/* Darken the image via brightness */
+.darken-01 {
+    --darken-amount: 0.3;
+    /* 1 = no darken; lower is darker */
+    filter: brightness(var(--darken-amount));
+    will-change: filter;
+}
+
+
+/* When both blur and darken are used together, combine filters */
+.blur-01.darken-01 {
+    filter: blur(var(--blur-radius, 20px)) brightness(var(--darken-amount, 0.3));
 }
