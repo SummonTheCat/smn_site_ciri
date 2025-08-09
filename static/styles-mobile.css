@@ -113,3 +113,49 @@
   header h1 { font-size: clamp(1.05rem, 2vw + 0.9rem, 1.25rem); }
   .container-inset { padding: 12px; }
 }
+
+/* ================================
+   iOS Safari: fixed background fix
+   (append to end of stylesheet)
+   ================================ */
+@supports (-webkit-touch-callout: none) {
+  /* Make sure the page height is based on the *visible* viewport */
+  body {
+    min-height: 100dvh;
+    height: auto;            /* avoid locking to legacy 100vh */
+    overflow-x: hidden;
+  }
+
+  /* Ensure your actual content sits above the bg image */
+  header, main, footer {
+    position: relative;      /* create stacking context */
+    z-index: 1;
+  }
+
+  /* Keep the transition overlay on top when used */
+  #page-transition-overlay {
+    position: fixed;
+    z-index: 2147483647;
+  }
+
+  /* Put the background firmly *behind* everything, sized to the dynamic viewport */
+  .fullscreen {
+    position: fixed;
+    top: 0; right: 0; bottom: 0; left: 0; /* equivalent to inset: 0; avoids height:auto ambiguity */
+    width: 100vw;
+    height: 100dvh;          /* dynamic viewport fixes Safari address bar issues */
+    min-height: 100dvh;
+    object-fit: cover;
+    object-position: center; /* tweak if you want a different focal point */
+    z-index: -1;
+    pointer-events: none;
+
+    /* Force its own compositing layer; helps Safari z-index/rendering glitches */
+    transform: translateZ(0) scale(1.025);
+  }
+
+  /* If you’re blurring/darkening, keep the combined filter authoritative */
+  .blur-01.darken-01 {
+    filter: blur(var(--blur-radius, 16px)) brightness(var(--darken-amount, 0.45));
+  }
+}
