@@ -1,0 +1,115 @@
+/* ===========================
+   Mobile-only responsive layer
+   (append to end of stylesheet)
+   =========================== */
+
+@media (max-width: 768px) {
+  /* Use modern viewport units on mobile so bg covers visible area */
+  .fullscreen {
+    /* keep your existing desktop rules intact; just refine for mobile */
+    width: 100vw;
+    min-height: 100vh; /* fallback if svh/dvh unsupported */
+    object-position: center 40%; /* tweak as needed for focal point */
+    transform: scale(1.025);     /* slight scale to hide blur edge */
+  }
+
+  /* Prefer svh/dvh on supporting browsers (inside mobile only) */
+  @supports (height: 100svh) {
+    .fullscreen {
+      height: 100svh;
+      min-height: 100svh;
+    }
+  }
+  @supports (height: 100dvh) {
+    .fullscreen {
+      height: 100dvh;
+      min-height: 100dvh;
+    }
+  }
+
+  /* Reduce blur / increase darken for readability on small screens */
+  :root {
+    --blur-radius: 16px;
+    --darken-amount: 0.45;
+
+    /* tighten spacing a touch on mobile */
+    --buffer-small: 0.45em;
+    --buffer-medium: 0.8em;
+    --buffer-large: 1.4em;
+  }
+
+  /* Keep combined filter authoritative (mobile only) */
+  .blur-01.darken-01 {
+    filter: blur(var(--blur-radius, 16px)) brightness(var(--darken-amount, 0.45));
+  }
+
+  /* Prevent horizontal scroll from long words/links */
+  html, body { overflow-x: hidden; }
+
+  /* Safe-area padding for notches/home indicators */
+  body {
+    padding-left: max(env(safe-area-inset-left), 0px);
+    padding-right: max(env(safe-area-inset-right), 0px);
+    padding-top: max(env(safe-area-inset-top), 0px);
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+
+  /* Fluid type on mobile only */
+  :root {
+    --fluid-step: clamp(0.95rem, 0.9rem + 0.8vw, 1.1rem);
+    --fluid-h1: clamp(1.25rem, 1.05rem + 2vw, 1.75rem);
+    --fluid-h2: clamp(1.1rem, 0.95rem + 1.4vw, 1.4rem);
+  }
+  body { font-size: var(--fluid-step); }
+  h1 { font-size: var(--fluid-h1); }
+  h2 { font-size: var(--fluid-h2); }
+
+  /* Touch targets & link comfort */
+  a, button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  a {
+    padding: 6px 10px;
+    text-decoration-thickness: 0.06em;
+    text-underline-offset: 0.18em;
+  }
+
+  /* Header can grow naturally with text */
+  header {
+    height: auto;
+    padding: calc(var(--buffer-small) + 2px) var(--buffer-medium);
+    gap: var(--buffer-small);
+  }
+
+  /* Content container sizing */
+  .msg-box {
+    max-width: min(92vw, 520px);
+    margin: clamp(8px, 2.5vh, 20px) auto;
+    padding: var(--buffer-medium);
+  }
+
+  .container-inset {
+    padding: clamp(12px, 2.5vw, var(--buffer-large));
+  }
+
+  /* Rows wrap nicely on narrow screens */
+  .flex-row { flex-wrap: wrap; }
+  .nav-buttons { gap: clamp(6px, 1.8vw, var(--buffer-medium)); }
+
+  /* Scaled spacing utilities */
+  .space-large { width: var(--buffer-large); height: var(--buffer-large); }
+  .space-medium { width: var(--buffer-medium); height: var(--buffer-medium); }
+  .space-small { width: var(--buffer-small); height: var(--buffer-small); }
+
+  /* Slightly bias vertical centering on short viewports */
+  .flex-center { align-items: flex-start !important; }
+}
+
+/* Extra-small phones */
+@media (max-width: 380px) {
+  .msg-box { max-width: 94vw; }
+  header h1 { font-size: clamp(1.05rem, 2vw + 0.9rem, 1.25rem); }
+  .container-inset { padding: 12px; }
+}
