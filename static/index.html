@@ -25,14 +25,11 @@
         width:100vw; height:100vh; opacity:1; will-change:opacity; visibility:visible;">
     </div>
 
-    <img class="blur-01 fullscreen darken-01" alt="" aria-hidden="true" sizes="100vw" loading="eager"
-        fetchpriority="high" src="graphics/bkg/wp3.jpg">
+    <!-- Background slot (will be filled by background component) -->
+    <div id="background-slot"></div>
 
-    <header class="flex-row nav-buttons">
-        <h1>
-            <a href="/" onclick="return tm.handleLinkClick(event, this)">Julien Liakos</a>
-        </h1>
-    </header>
+    <!-- Header slot (will be filled by header component) -->
+    <div id="header-slot"></div>
 
     <main class="flex-center flex-grow">
         <div class="msg-box">
@@ -73,23 +70,16 @@
                 <div class="space-small"></div>
 
                 <!-- Email -->
-                <a id="contact-email"
-                   href="#"
-                   data-mode="email"
-                   data-email="julien_andrew@outlook.com"
-                   data-subject="Contacting%20from%20website"
-                   data-body="">
-                   Email
+                <a id="contact-email" href="#" data-mode="email" data-email="julien_andrew@outlook.com"
+                    data-subject="Contacting%20from%20website" data-body="">
+                    Email
                 </a>
 
                 <div class="space-small"></div>
 
                 <!-- Discord handle only, no invite link -->
-                <a id="contact-discord"
-                   href="#"
-                   data-mode="discord"
-                   data-discord="@summonthecat">
-                   Discord
+                <a id="contact-discord" href="#" data-mode="discord" data-discord="@summonthecat">
+                    Discord
                 </a>
 
                 <div class="space-small"></div>
@@ -101,6 +91,7 @@
 
     <!-- Scripts -->
     <script src="scripts/transitionManager.js"></script>
+    <script src="scripts/componentManager.js"></script>
     <script src="scripts/linkReplacer.js"></script>
     <script>
         // Initialize page transition
@@ -111,9 +102,14 @@
             transitionEffect: 'fade'
         });
 
+        // Apply components
+        applyComponent('#header-slot', 'header', '');
+        applyComponent('#background-slot', 'background', []);
+
         // Initialize contact reveal logic
         initContactLinks('#contact-email, #contact-discord');
     </script>
+    
 </body>
 
 </html>

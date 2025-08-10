@@ -29,48 +29,31 @@
               width:100vw; height:100vh; opacity:1; will-change:opacity; visibility:visible;">
   </div>
 
-  <!-- Background image that your overlay can mirror (if you enable backgroundFrom later) -->
-  <img class="blur-01 fullscreen darken-01" alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high"
-    src="graphics/bkg/wp3.jpg">
+  <!-- Background slot (will be filled by background component) -->
+  <div id="background-slot"></div>
 
-  <!-- Header -->
-  <header class="flex-row nav-buttons">
-    <h1>
-      <a href="/" onclick="return tm.handleLinkClick(event, this)">Julien Liakos</a>
-    </h1>
-    <h4>Development</h4>
-  </header>
+  <!-- Header slot (component will render here) -->
+  <div id="header-slot">Loading header…</div>
 
-  <main class="flex-center text-center flex-grow">
-    <div class="msg-box">
-      <div class="space-large"></div>
-      <div class="flex-center">
-        <div style="height: 100px; width: 100px;">
-          <img src="/graphics/SmnIcon_Circle_White.svg" alt="">
-        </div>
-      </div>
-      <div class="space-large"></div>
-      <h4>Under Construction</h4>
-      <p class="space-small"></p>
-      <p>This site is under construction, come back later for some cool stuff.</p>
-      <div class="space-large"></div>
-    </div>
-  </main>
+  <!-- Under construction slot (component will render here) -->
+  <div id="under-construction">Loading under construction message…</div>
 
-  <!-- Transition manager: load, then initialize ONCE -->
+  <!-- Scripts -->
   <script src="scripts/transitionManager.js"></script>
+  <script src="scripts/componentManager.js"></script>
   <script>
     // Make tm global for inline onclick handlers
     window.tm = new TransitionManager({
       overlaySelector: '#page-transition-overlay',
       duration: 300,
       bufferTime: 30,
-      transitionEffect: 'fade',
-      // Optional extras you can enable later:
-      // backgroundFrom: '.blur-01', // if you add this option to your class
-      // copyFilter: true,           // keep blur/darken on overlay
-      // darken: 0.15                // add a bit more darkening
+      transitionEffect: 'fade'
     });
+
+    // Apply components
+    applyComponent('#header-slot', 'header', 'Development');
+    applyComponent('#under-construction', 'underConstruction', []);
+    applyComponent('#background-slot', 'background', []);
   </script>
 </body>
 

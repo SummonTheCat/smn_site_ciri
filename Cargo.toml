@@ -1,6 +1,6 @@
 [package]
 name = "smn_site_ciri"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 
 [dependencies]
@@ -8,4 +8,7 @@ tokio = { version = "1", features = ["full"] }
 hyper = { version = "0.14", features = ["server", "tcp", "http1"] }
 async-trait = "0.1"
 
-smn_web_core = "=0.1.6"
+smn_web_core = "=0.1.7"
+serde = {version="1.0.219", features=["derive"]}
+serde_json = "1.0.142"
+urlencoding = "2.1.3"

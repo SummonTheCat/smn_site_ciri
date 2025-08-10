@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Broadcast Test</title>
+
+  <link rel="stylesheet" href="styles/styles-base.css" />
+  <link rel="stylesheet" href="styles/styles-elements.css" />
+  <link rel="stylesheet" href="styles/styles-mobile.css" />
+  <style>
+    #broadcast-visualizer { font-family: sans-serif; padding: 20px; }
+    #broadcast-log { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto;
+                     border: 1px solid #444; background: #111; }
+    #broadcast-log li { padding: 6px 10px; border-bottom: 1px solid #222; color: #fff; font-size: 14px; }
+    #broadcast-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+    #broadcast-controls label { display: flex; align-items: center; gap: 4px; color: #ccc; font-size: 14px; }
+    #broadcast-controls input { padding: 4px; }
+    #broadcast-controls button { padding: 5px 10px; }
+  </style>
+</head>
+
+<body>
+  <div id="header-slot">Loading header…</div>
+
+  <div id="broadcast-visualizer">
+    <h2>Broadcast Visualizer</h2>
+    <div id="broadcast-controls">
+      <label>
+        Context ID:
+        <input type="text" id="context-id" placeholder="e.g. 421" value="421">
+      </label>
+      <button id="set-context-btn">Set Context</button>
+      <label>
+        Emit ID:
+        <input type="text" id="emit-id" placeholder="e.g. 421">
+      </label>
+      <button id="emit-btn">Emit</button>
+    </div>
+    <ul id="broadcast-log"></ul>
+  </div>
+
+  <script src="scripts/broadcastManager.js"></script>
+  <script>
+    const logList = document.getElementById('broadcast-log');
+    const contextInput = document.getElementById('context-id');
+    const emitInput = document.getElementById('emit-id');
+
+    function logBroadcast(id) {
+      const li = document.createElement('li');
+      const time = new Date().toLocaleTimeString();
+      li.textContent = `[${time}] Broadcast ID: ${id}`;
+      logList.prepend(li);
+      while (logList.children.length > 50) {
+        logList.removeChild(logList.lastChild);
+      }
+    }
+
+    // Initialize BroadcastManager
+    window.bm = new BroadcastManager(contextInput.value.trim(), function (id) {
+      logBroadcast(id);
+    });
+
+    // Set Context button
+    document.getElementById('set-context-btn').addEventListener('click', () => {
+      bm.setContextIDs(contextInput.value.trim());
+    });
+
+    // Emit button
+    document.getElementById('emit-btn').addEventListener('click', () => {
+      const code = emitInput.value.trim();
+      if (code) {
+        bm.emitToID(code);
+      }
+    });
+  </script>
+</body>
+</html>
