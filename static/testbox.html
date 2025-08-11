@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Funnel+Display:wght@300..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Lexend:wght@100..900&family=Mozilla+Headline:wght@200..700&display=swap"
+    rel="stylesheet">
+
+  <title>TestBox</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles/styles-base.css" />
+  <link rel="stylesheet" href="styles/styles-elements.css" />
+  <link rel="stylesheet" href="styles/styles-mobile.css" />
+</head>
+
+<body>
+  <!-- Page transition overlay: starts visible so B→C plays on load -->
+  <div id="page-transition-overlay" style="background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
+              width:100vw; height:100vh; opacity:1; will-change:opacity; visibility:visible;">
+  </div>
+
+  <!-- Background slot (will be filled by background component) -->
+  <div id="background-slot"></div>
+
+  <!-- Header slot (component will render here) -->
+  <div id="header-slot">Loading header…</div>
+
+  <main class="flex-center text-center flex-grow">
+
+    <div class="msg-box" style="height: 350px; width: 300px;">
+      <div class="flex-center">
+        <div style="height: 100px; width: 100px;">
+          <img src="/graphics/SmnIcon_Circle_White.svg" alt="">
+        </div>
+      </div>
+      <div class="space-large"></div>
+      <h4>TestBox</h4>
+      <p class="space-small"></p>
+      <a href="tests/test-broadcast.html" onclick="return tm.handleLinkClick(event, this)">Broadcast Testing</a>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="scripts/transitionManager.js"></script>
+  <script src="scripts/componentManager.js"></script>
+  <script>
+    // Make tm global for inline onclick handlers
+    window.tm = new TransitionManager({
+      overlaySelector: '#page-transition-overlay',
+      duration: 300,
+      bufferTime: 30,
+      transitionEffect: 'fade'
+    });
+
+    // Apply components
+    applyComponent('#header-slot', 'header', 'TestBox');
+    applyComponent('#background-slot', 'background', []);
+  </script>
+</body>
+
+</html>
