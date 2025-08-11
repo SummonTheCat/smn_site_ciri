@@ -10,7 +10,6 @@ async fn main() {
     let mut manager = PluginManager::new();
     let mut components = plugins::plugin_components::PluginComponents::new();
 
-    components.register(plugins::plugin_components::components::comp_header::CompHeader);
     components.register_simple("./components/underConstruction.html");
 
     manager.apply_plugin(Box::new(components));

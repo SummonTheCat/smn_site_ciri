@@ -25,8 +25,7 @@
 
 <body>
   <!-- Transition overlay starts visible so B→C runs after initial batch -->
-  <div id="page-transition-overlay"
-       style="background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
+  <div id="page-transition-overlay" style="background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
               width:100vw; height:100vh; opacity:1; will-change:opacity; visibility:visible;">
   </div>
 
@@ -34,8 +33,15 @@
   <img class="blur-01 fullscreen darken-01" alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high"
     src="graphics/bkg/wp3.jpg">
 
+  <!-- Header -->
+  <header class="flex-row nav-buttons">
+    <h1>
+      <a href="/" onclick="return tm.handleLinkClick(event, this)">Julien Liakos</a>
+    </h1>
+    <h4>Technical Art</h4>
+  </header>
+
   <!-- Slots -->
-  <div id="header-slot"></div>
   <div id="under-construction"></div>
 
   <!-- Scripts -->
@@ -52,32 +58,11 @@
       duration: 300,
       bufferTime: 30,
       transitionEffect: 'fade',
-      initialHold: true,          // don't auto-run B→C yet
+      initialHold: false,          // don't auto-run B→C yet
       initialHoldTimeoutMs: 8000, // failsafe
     });
 
-    // 2) Define the initial batch that MUST be present before revealing the page.
-    const initialBatch = [
-      { target: '#header-slot',     name: 'header',     args: ['Technical Art'] }
-    ];
-
-    // 3) Kick off the batch and release the hold when (only) the batch is done.
-    //    This awaits JUST the batch (not underConstruction), so the overlay leaves as soon as the
-    //    critical components are ready, while lazy stuff continues loading independently.
-    (async () => {
-      try {
-        await applyComponentsGroup(initialBatch, {
-          onProgress(i, total) {
-            // optional: console.log(`[batch] ${i}/${total}`);
-          }
-        });
-      } catch (e) {
-        console.error('Initial batch failed:', e);
-        // We still release so the user isn't stuck behind the overlay.
-      } finally {
-        await tm.releaseInitialHold();
-      }
-    })();
   </script>
 </body>
+
 </html>

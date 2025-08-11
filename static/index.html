@@ -113,30 +113,9 @@
             duration: 300,
             bufferTime: 30,
             transitionEffect: 'fade',
-            initialHold: true,          // don't auto-run B→C yet
+            initialHold: false,          // don't auto-run B→C yet
             initialHoldTimeoutMs: 8000, // failsafe so it never sticks
         });
-
-        // 2) Define the critical components that must be ready before we reveal the page.
-        const initialBatch = [
-            { target: '#header-slot', name: 'header', args: [''] }
-        ];
-
-        // 3) Mount the batch in parallel; release the overlay when done.
-        (async () => {
-            try {
-                await applyComponentsGroup(initialBatch, {
-                    onProgress(i, total) {
-                        // optional: console.log(`[initial batch] ${i}/${total}`);
-                    }
-                });
-            } catch (err) {
-                console.error('Initial batch failed:', err);
-                // We still release so the user isn't stuck behind the overlay.
-            } finally {
-                await tm.releaseInitialHold();
-            }
-        })();
     </script>
 </body>
 
