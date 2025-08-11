@@ -3,18 +3,29 @@
   class ComponentManager {
     /**
      * @param {Object} options
-     * @param {string} [options.basePath='/components'] - Base route for components.
-     * @param {boolean} [options.extractBody=true] - If true, extracts <body> innerHTML from full documents.
+     * @param {string}  [options.basePath='/components'] - Base route for components.
+     * @param {boolean} [options.extractBody=true]       - If true, extracts <body> innerHTML from full documents.
+     * @param {boolean} [options.fadeIn=false]           - If true, fade in newly mounted content.
+     * @param {number}  [options.fadeInDuration=250]     - Fade duration in ms.
+     * @param {string}  [options.fadeInEasing='ease-out']- CSS easing for fade.
      */
     constructor({
       basePath = '/components',
       extractBody = true,
+      fadeIn = false,
+      fadeInDuration = 250,
+      fadeInEasing = 'ease-out',
     } = {}) {
       if (typeof window === 'undefined' || typeof window.fetch !== 'function') {
         throw new Error('ComponentManager: must run in a browser environment with fetch support.');
       }
       this.basePath = (basePath || '/components').replace(/\/+$/, '');
       this.extractBody = !!extractBody;
+
+      // Fade options
+      this.fadeIn = !!fadeIn;
+      this.fadeInDuration = Math.max(0, Number(fadeInDuration) || 0);
+      this.fadeInEasing = String(fadeInEasing || 'ease-out');
     }
 
     /** Fetch a component’s HTML (as text) */
@@ -43,31 +54,57 @@
 
       switch (mode) {
         case 'replace': {
+          // Replace the inner HTML of target; fade the container itself for a smooth swap.
+          if (this.fadeIn) this._prepareFade(el);
           el.innerHTML = html;
+          if (this.fadeIn) this._runFade([el]);
           return el;
         }
+
         case 'outerReplace': {
           const fragment = this._htmlToFragment(html);
-          const firstNode = fragment.firstElementChild || fragment.firstChild || null;
+          const inserted = this._nodesOfFragment(fragment);
           el.replaceWith(fragment);
-          return (firstNode && firstNode.nodeType === 1) ? firstNode : (el.parentElement || document.body);
+          if (this.fadeIn) this._runFade(inserted);
+          const firstNode =
+            inserted.find(n => n.nodeType === 1) || null;
+          return firstNode || (el.parentElement || document.body);
         }
+
         case 'append': {
-          el.insertAdjacentHTML('beforeend', html);
+          const fragment = this._htmlToFragment(html);
+          const inserted = this._nodesOfFragment(fragment);
+          el.appendChild(fragment);
+          if (this.fadeIn) this._runFade(inserted);
           return el;
         }
+
         case 'prepend': {
-          el.insertAdjacentHTML('afterbegin', html);
+          const fragment = this._htmlToFragment(html);
+          const inserted = this._nodesOfFragment(fragment);
+          el.insertBefore(fragment, el.firstChild);
+          if (this.fadeIn) this._runFade(inserted);
           return el;
         }
+
         case 'before': {
-          el.insertAdjacentHTML('beforebegin', html);
+          const fragment = this._htmlToFragment(html);
+          const inserted = this._nodesOfFragment(fragment);
+          el.parentNode ? el.parentNode.insertBefore(fragment, el) : null;
+          if (this.fadeIn) this._runFade(inserted);
           return el.previousElementSibling || el;
         }
+
         case 'after': {
-          el.insertAdjacentHTML('afterend', html);
+          const fragment = this._htmlToFragment(html);
+          const inserted = this._nodesOfFragment(fragment);
+          el.parentNode
+            ? el.parentNode.insertBefore(fragment, el.nextSibling)
+            : null;
+          if (this.fadeIn) this._runFade(inserted);
           return el.nextElementSibling || el;
         }
+
         default:
           throw new Error(`ComponentManager.mount: unknown mode "${mode}"`);
       }
@@ -84,7 +121,6 @@
       if (!Array.isArray(batch) || batch.length === 0) return [];
       const total = batch.length;
 
-      // Kick off all fetches first for better parallelism
       const jobs = batch.map(async (item, i) => {
         const { target, name, args = [], mountMode = mode } = item || {};
         try {
@@ -97,7 +133,6 @@
         }
       });
 
-      // Fail-fast if any component throws
       return Promise.all(jobs);
     }
 
@@ -107,6 +142,7 @@
     }
 
     // ---------- internals ----------
+
     _resolveTarget(target) {
       if (target instanceof Element) return target;
       if (typeof target === 'string') {
@@ -134,6 +170,50 @@
       tpl.innerHTML = html;
       return tpl.content.cloneNode(true);
     }
+
+    _nodesOfFragment(fragment) {
+      // Collect top-level nodes that will be inserted
+      const nodes = [];
+      for (let n = fragment.firstChild; n; n = n.nextSibling) {
+        nodes.push(n);
+      }
+      return nodes;
+    }
+
+    // ---------- fade helpers ----------
+
+    _prepareFade(node) {
+      if (!(node instanceof Element)) return;
+      node.style.opacity = '0';
+      node.style.willChange = 'opacity';
+      node.style.transition = `opacity ${this.fadeInDuration}ms ${this.fadeInEasing}`;
+    }
+
+    _runFade(nodes) {
+      // Apply fade to element nodes only
+      const elems = nodes.filter(n => n && n.nodeType === 1);
+      if (elems.length === 0) return;
+
+      // Prepare all
+      elems.forEach(el => this._prepareFade(el));
+
+      // Kick transitions on next frame
+      requestAnimationFrame(() => {
+        elems.forEach(el => (el.style.opacity = '1'));
+        // Cleanup styles after transition ends
+        const cleanup = (el) => {
+          const done = () => {
+            el.style.willChange = '';
+            el.style.transition = '';
+            el.removeEventListener('transitionend', done);
+          };
+          el.addEventListener('transitionend', done);
+          // In case transitionend doesn’t fire (display changes, etc.)
+          setTimeout(done, this.fadeInDuration + 50);
+        };
+        elems.forEach(cleanup);
+      });
+    }
   }
 
   // ---------- Global helpers (singleton manager) ----------
@@ -141,7 +221,14 @@
   async function applyComponent(targetElement, targetComponent, componentArgs) {
     const cm = (window.cm instanceof ComponentManager)
       ? window.cm
-      : (window.cm = new ComponentManager({ basePath: '/components', extractBody: true }));
+      : (window.cm = new ComponentManager({
+          basePath: '/components',
+          extractBody: true,
+          // Set your site-wide defaults here:
+          fadeIn: true,
+          fadeInDuration: 250,
+          fadeInEasing: 'ease-out',
+        }));
 
     const args = Array.isArray(componentArgs)
       ? componentArgs
@@ -175,8 +262,14 @@
   async function applyComponentsGroup(batch, opts = {}) {
     const cm = (window.cm instanceof ComponentManager)
       ? window.cm
-      : (window.cm = new ComponentManager({ basePath: '/components', extractBody: true }));
-    // Wait for DOM if any string selector appears and DOM is still loading
+      : (window.cm = new ComponentManager({
+          basePath: '/components',
+          extractBody: true,
+          fadeIn: true,
+          fadeInDuration: 250,
+          fadeInEasing: 'ease-out',
+        }));
+
     if (document.readyState === 'loading' && batch.some(it => typeof it?.target === 'string')) {
       await new Promise(res => document.addEventListener('DOMContentLoaded', res, { once: true }));
     }

@@ -48,6 +48,15 @@
   <script src="scripts/transitionManager.js"></script>
   <script src="scripts/componentManager.js"></script>
   <script>
+    // Ensure our ComponentManager singleton uses fade-in for components.
+    window.cm = new ComponentManager({
+      basePath: '/components',
+      extractBody: true,
+      fadeIn: true,           // enable fade
+      fadeInDuration: 400,    // ms
+      fadeInEasing: 'ease-in-out', // easing function
+    });
+
     // 0) Fire-and-forget any non-critical components IMMEDIATELY.
     //    This does NOT await, so it cannot be delayed by the initial batch or the transition.
     void applyComponent('#under-construction', 'underConstruction', []);
@@ -61,8 +70,6 @@
       initialHold: false,          // don't auto-run B→C yet
       initialHoldTimeoutMs: 8000, // failsafe
     });
-
-
   </script>
 </body>
 
