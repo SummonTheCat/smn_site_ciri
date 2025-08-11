@@ -9,71 +9,286 @@
   <link rel="stylesheet" href="styles/styles-base.css" />
   <link rel="stylesheet" href="styles/styles-elements.css" />
   <link rel="stylesheet" href="styles/styles-mobile.css" />
+
   <style>
-    #broadcast-visualizer { font-family: sans-serif; padding: 20px; }
-    #broadcast-log { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto;
-                     border: 1px solid #444; background: #111; }
-    #broadcast-log li { padding: 6px 10px; border-bottom: 1px solid #222; color: #fff; font-size: 14px; }
-    #broadcast-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-    #broadcast-controls label { display: flex; align-items: center; gap: 4px; color: #ccc; font-size: 14px; }
-    #broadcast-controls input { padding: 4px; }
-    #broadcast-controls button { padding: 5px 10px; }
+    :root {
+      --controls-bg: rgba(17, 17, 17, 0.95);
+      --controls-border: #333;
+      --text-muted: #ccc;
+      --status-bg: #1f2937;   /* slate-800 */
+      --status-text: #e5e7eb; /* gray-200 */
+      --status-ok: #10b981;   /* emerald-500 */
+      --status-warn: #f59e0b; /* amber-500 */
+      --status-err: #ef4444;  /* red-500 */
+    }
+
+    body {
+      margin: 0;
+      background: #0b0b0b;
+      color: #fff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "DM Sans", Arial, sans-serif;
+    }
+
+    /* Fixed controls at the top */
+    #controls-fixed {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 2147483000;
+      background: var(--controls-bg);
+      border-bottom: 1px solid var(--controls-border);
+      backdrop-filter: blur(6px);
+    }
+
+    #controls-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between; /* left inputs / right status */
+      padding: 10px 14px;
+      gap: 12px;
+    }
+
+    #controls-left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    #controls-left label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    #controls-left input {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #2b2b2b;
+      background: #141414;
+      color: #fff;
+      min-width: 120px;
+    }
+
+    #controls-left button {
+      padding: 7px 12px;
+      border-radius: 6px;
+      border: 1px solid #2b2b2b;
+      background: #1d1d1d;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    #controls-left button:hover {
+      background: #232323;
+    }
+
+    /* Status pill on the right */
+    #status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--status-bg);
+      color: var(--status-text);
+      font-size: 13px;
+      border: 1px solid #2b2b2b;
+      white-space: nowrap;
+      max-width: 50vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #status .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--status-warn);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.06) inset;
+      flex: none;
+    }
+
+    /* Animate when status changes */
+    @keyframes statusPop {
+      0% { transform: translateY(-6px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .flash {
+      animation: statusPop .28s ease-out;
+    }
+
+    /* Spacer to push content below fixed bar */
+    #controls-spacer {
+      width: 100%;
+      height: 64px; /* synced in JS */
+    }
+
+    /* Visualizer + log */
+    #broadcast-visualizer {
+      padding: 16px;
+    }
+
+    #broadcast-visualizer h2 {
+      margin: 0 0 12px 0;
+      font-weight: 600;
+    }
+
+    #broadcast-log {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border: 1px solid #444;
+      background: #111;
+    }
+
+    #broadcast-log li {
+      padding: 8px 12px;
+      border-bottom: 1px solid #222;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    #broadcast-log li:last-child {
+      border-bottom: none;
+    }
   </style>
 </head>
 
 <body>
-  <div id="header-slot">Loading header…</div>
+  <!-- Fixed controls -->
+  <div id="controls-fixed">
+    <div id="controls-inner">
+      <div id="controls-left">
+        <label>
+          ContextID:
+          <input type="text" id="context-id" placeholder="e.g. 421" value="">
+        </label>
+        <button id="set-context-btn">Set Context</button>
 
+        <label>
+          EmitID:
+          <input type="text" id="emit-id" placeholder="e.g. 421">
+        </label>
+        <button id="emit-btn">Emit</button>
+      </div>
+
+      <!-- Status pill -->
+      <div id="status">
+        <span class="dot"></span>
+        <span id="status-text">No context set. Enter a Context ID and click “Set Context”.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spacer to offset fixed controls -->
+  <div id="controls-spacer"></div>
+
+  <!-- Visualizer -->
   <div id="broadcast-visualizer">
     <h2>Broadcast Visualizer</h2>
-    <div id="broadcast-controls">
-      <label>
-        Context ID:
-        <input type="text" id="context-id" placeholder="e.g. 421" value="421">
-      </label>
-      <button id="set-context-btn">Set Context</button>
-      <label>
-        Emit ID:
-        <input type="text" id="emit-id" placeholder="e.g. 421">
-      </label>
-      <button id="emit-btn">Emit</button>
-    </div>
     <ul id="broadcast-log"></ul>
   </div>
 
   <script src="scripts/broadcastManager.js"></script>
   <script>
-    const logList = document.getElementById('broadcast-log');
-    const contextInput = document.getElementById('context-id');
-    const emitInput = document.getElementById('emit-id');
+    // Sync spacer with controls height
+    const controls = document.getElementById('controls-fixed');
+    const spacer   = document.getElementById('controls-spacer');
+    function syncSpacerHeight() {
+      spacer.style.height = controls.offsetHeight + 'px';
+    }
+    window.addEventListener('load', syncSpacerHeight);
+    window.addEventListener('resize', syncSpacerHeight);
+    setTimeout(syncSpacerHeight, 0);
 
-    function logBroadcast(id) {
-      const li = document.createElement('li');
-      const time = new Date().toLocaleTimeString();
-      li.textContent = `[${time}] Broadcast ID: ${id}`;
-      logList.prepend(li);
-      while (logList.children.length > 50) {
-        logList.removeChild(logList.lastChild);
-      }
+    // Elements
+    const logList      = document.getElementById('broadcast-log');
+    const contextInput = document.getElementById('context-id');
+    const emitInput    = document.getElementById('emit-id');
+    const statusEl     = document.getElementById('status');
+    const statusText   = document.getElementById('status-text');
+    const statusDot    = statusEl.querySelector('.dot');
+
+    // Status helpers
+    function setStatus(message, level = 'warn') {
+      // level: 'ok' | 'warn' | 'err'
+      const colors = {
+        ok:   getComputedStyle(document.documentElement).getPropertyValue('--status-ok').trim(),
+        warn: getComputedStyle(document.documentElement).getPropertyValue('--status-warn').trim(),
+        err:  getComputedStyle(document.documentElement).getPropertyValue('--status-err').trim(),
+      };
+      statusText.textContent = message;
+      statusDot.style.background = colors[level] || colors.warn;
+
+      // re-trigger animation
+      statusEl.classList.remove('flash');
+      // force reflow
+      void statusEl.offsetWidth;
+      statusEl.classList.add('flash');
     }
 
-    // Initialize BroadcastManager
-    window.bm = new BroadcastManager(contextInput.value.trim(), function (id) {
-      logBroadcast(id);
-    });
+    function timeNow() {
+      return new Date().toLocaleTimeString();
+    }
+
+    // Append log to bottom and scroll page to bottom
+    function logBroadcast(id) {
+      const li = document.createElement('li');
+      li.textContent = `[${timeNow()}] Broadcast ID: ${id}`;
+      logList.appendChild(li);
+
+      // Keep list reasonably bounded in dev
+      if (logList.children.length > 200) {
+        logList.removeChild(logList.firstChild);
+      }
+
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+      });
+    }
+
+    // BroadcastManager instance (start with no context set)
+    let bm = null;
 
     // Set Context button
     document.getElementById('set-context-btn').addEventListener('click', () => {
-      bm.setContextIDs(contextInput.value.trim());
+      const ctx = contextInput.value.trim();
+
+      if (!ctx) {
+        setStatus('Context not set: please enter a Context ID.', 'err');
+        return;
+      }
+
+      if (!bm) {
+        bm = new BroadcastManager([ctx], function (id) {
+          logBroadcast(id);
+        });
+      } else {
+        bm.setContextIDs([ctx]);
+      }
+
+      setStatus(`Context set to "${ctx}" at ${timeNow()}.`, 'ok');
     });
 
     // Emit button
     document.getElementById('emit-btn').addEventListener('click', () => {
       const code = emitInput.value.trim();
-      if (code) {
-        bm.emitToID(code);
+      if (!code) {
+        setStatus('Emit failed: please enter an Emit ID.', 'err');
+        return;
       }
+      if (!bm) {
+        setStatus('Emit sent, but no context is set yet. Set a Context ID to listen.', 'warn');
+      }
+      bm ? bm.emitToID(code) : fetch(`/emit/${encodeURIComponent(code)}`);
+      setStatus(`Emitted "${code}" at ${timeNow()}.`, 'ok');
     });
+
+    // Initial status prompt
+    setStatus('No context set. Enter a Context ID and click “Set Context”.', 'warn');
   </script>
 </body>
 </html>
