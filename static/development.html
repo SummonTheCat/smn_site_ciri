@@ -25,13 +25,15 @@
 
 <body>
   <!-- Transition overlay starts visible so B→C runs after initial batch -->
-  <div id="page-transition-overlay"
-       style="background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
+  <div id="page-transition-overlay" style="background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
               width:100vw; height:100vh; opacity:1; will-change:opacity; visibility:visible;">
   </div>
 
+  <!-- Background Image -->
+  <img class="blur-01 fullscreen darken-01" alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high"
+    src="graphics/bkg/wp3.jpg">
+
   <!-- Slots -->
-  <div id="background-slot"></div>
   <div id="header-slot"></div>
   <div id="under-construction"></div>
 
@@ -55,8 +57,7 @@
 
     // 2) Define the initial batch that MUST be present before revealing the page.
     const initialBatch = [
-      { target: '#header-slot',     name: 'header',     args: ['Development'] },
-      { target: '#background-slot', name: 'background', args: [] },
+      { target: '#header-slot', name: 'header', args: ['Development'] }
     ];
 
     // 3) Kick off the batch and release the hold when (only) the batch is done.
@@ -78,4 +79,5 @@
     })();
   </script>
 </body>
+
 </html>
