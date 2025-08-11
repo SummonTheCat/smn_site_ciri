@@ -2,114 +2,146 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Funnel+Display:wght@300..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Lexend:wght@100..900&family=Mozilla+Headline:wght@200..700&display=swap"
-        rel="stylesheet">
-    <title>Julien Liakos</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="stylesheet" href="styles/styles-base.css" />
-    <link rel="stylesheet" href="styles/styles-elements.css" />
-    <link rel="stylesheet" href="styles/styles-mobile.css" />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Funnel+Display:wght@300..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Lexend:wght@100..900&family=Mozilla+Headline:wght@200..700&display=swap"
+    rel="stylesheet">
+
+  <title>Julien Liakos</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles/styles-base.css" />
+  <link rel="stylesheet" href="styles/styles-elements.css" />
+  <link rel="stylesheet" href="styles/styles-mobile.css" />
 </head>
 
 <body>
-    <!-- Overlay starts visible so the initial B→C animation can play -->
-    <div id="page-transition-overlay" style="background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
+  <!-- Transition overlay starts visible so we can delay B→C until the initial batch is ready -->
+  <div id="page-transition-overlay" style="
+        background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
         width:100vw; height:100vh; opacity:1; will-change:opacity; visibility:visible;">
-    </div>
+  </div>
 
-    <!-- Background slot (will be filled by background component) -->
-    <div id="background-slot"></div>
+  <!-- Background + Header component slots -->
+  <div id="background-slot"></div>
+  <div id="header-slot"></div>
 
-    <!-- Header slot (will be filled by header component) -->
-    <div id="header-slot"></div>
+  <main class="flex-center flex-grow">
+    <div class="msg-box">
+      <div class="space-medium"></div>
 
-    <main class="flex-center flex-grow">
-        <div class="msg-box">
-            <div class="space-medium"></div>
-            <div class="flex-center">
-                <div style="height: 100px; width: 100px;">
-                    <img src="/graphics/SmnIcon_Circle_White.svg" alt="">
-                </div>
-            </div>
-            <div class="space-large"></div>
-            <div class="container-inset">
-                <p class="text-center">
-                    From creative projects in Game Design, to Development projects like low-level data archiving
-                    libraries, I bridge the gap between art and development.
-                    <br><br>
-                    Pick something that interests you down below, and take a look...
-                </p>
-            </div>
-
-            <div class="space-large"></div>
-
-            <h4>My Work</h4>
-            <div class="space-small"></div>
-            <div class="flex-row flex-center-horizontal flex-grow">
-                <div class="space-small"></div>
-                <a href="technical-art" onclick="return tm.handleLinkClick(event, this)">Technical Art</a>
-                <div class="space-small"></div>
-                <a href="game-design" onclick="return tm.handleLinkClick(event, this)">Game Design</a>
-                <div class="space-small"></div>
-                <a href="development" onclick="return tm.handleLinkClick(event, this)">Development</a>
-            </div>
-
-            <div class="space-large"></div>
-
-            <h4>Contact</h4>
-            <div class="space-small"></div>
-            <div class="flex-row flex-center-horizontal flex-grow">
-                <div class="space-small"></div>
-
-                <!-- Email -->
-                <a id="contact-email" href="#" data-mode="email" data-email="julien_andrew@outlook.com"
-                    data-subject="Contacting%20from%20website" data-body="">
-                    Email
-                </a>
-
-                <div class="space-small"></div>
-
-                <!-- Discord handle only, no invite link -->
-                <a id="contact-discord" href="#" data-mode="discord" data-discord="@summonthecat">
-                    Discord
-                </a>
-
-                <div class="space-small"></div>
-            </div>
-
-            <div class="space-medium"></div>
+      <div class="flex-center">
+        <div style="height: 100px; width: 100px;">
+          <img src="/graphics/SmnIcon_Circle_White.svg" alt="">
         </div>
-    </main>
+      </div>
 
-    <!-- Scripts -->
-    <script src="scripts/transitionManager.js"></script>
-    <script src="scripts/componentManager.js"></script>
-    <script src="scripts/linkReplacer.js"></script>
-    <script>
-        // Initialize page transition
-        window.tm = new TransitionManager({
-            overlaySelector: '#page-transition-overlay',
-            duration: 300,
-            bufferTime: 30,
-            transitionEffect: 'fade'
+      <div class="space-large"></div>
+
+      <div class="container-inset">
+        <p class="text-center">
+          From creative projects in Game Design, to Development projects like low-level data archiving libraries,
+          I bridge the gap between art and development.
+          <br><br>
+          Pick something that interests you down below, and take a look...
+        </p>
+      </div>
+
+      <div class="space-large"></div>
+
+      <h4>My Work</h4>
+      <div class="space-small"></div>
+      <div class="flex-row flex-center-horizontal flex-grow">
+        <div class="space-small"></div>
+        <a href="technical-art" onclick="return tm.handleLinkClick(event, this)">Technical Art</a>
+        <div class="space-small"></div>
+        <a href="game-design" onclick="return tm.handleLinkClick(event, this)">Game Design</a>
+        <div class="space-small"></div>
+        <a href="development" onclick="return tm.handleLinkClick(event, this)">Development</a>
+      </div>
+
+      <div class="space-large"></div>
+
+      <h4>Contact</h4>
+      <div class="space-small"></div>
+      <div class="flex-row flex-center-horizontal flex-grow">
+        <div class="space-small"></div>
+
+        <!-- Email -->
+        <a id="contact-email"
+           href="#"
+           data-mode="email"
+           data-email="julien_andrew@outlook.com"
+           data-subject="Contacting%20from%20website"
+           data-body="">
+          Email
+        </a>
+
+        <div class="space-small"></div>
+
+        <!-- Discord handle only, no invite link -->
+        <a id="contact-discord"
+           href="#"
+           data-mode="discord"
+           data-discord="@summonthecat">
+          Discord
+        </a>
+
+        <div class="space-small"></div>
+      </div>
+
+      <div class="space-medium"></div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="scripts/transitionManager.js"></script>
+  <script src="scripts/componentManager.js"></script>
+  <script src="scripts/linkReplacer.js"></script>
+  <script>
+    // 0) Fire any non-critical stuff immediately (no coupling to transition)
+    initContactLinks('#contact-email, #contact-discord');
+
+    // 1) Create TransitionManager with an initial hold so we control when the overlay leaves.
+    window.tm = new TransitionManager({
+      overlaySelector: '#page-transition-overlay',
+      duration: 300,
+      bufferTime: 30,
+      transitionEffect: 'fade',
+      initialHold: true,          // don't auto-run B→C yet
+      initialHoldTimeoutMs: 8000, // failsafe so it never sticks
+    });
+
+    // 2) Define the critical components that must be ready before we reveal the page.
+    const initialBatch = [
+      { target: '#header-slot',     name: 'header',     args: [''] },
+      { target: '#background-slot', name: 'background', args: [] },
+    ];
+
+    // 3) Mount the batch in parallel; release the overlay when done.
+    (async () => {
+      try {
+        await applyComponentsGroup(initialBatch, {
+          onProgress(i, total) {
+            // optional: console.log(`[initial batch] ${i}/${total}`);
+          }
         });
-
-        // Apply components
-        applyComponent('#header-slot', 'header', '');
-        applyComponent('#background-slot', 'background', []);
-
-        // Initialize contact reveal logic
-        initContactLinks('#contact-email, #contact-discord');
-    </script>
-    
+      } catch (err) {
+        console.error('Initial batch failed:', err);
+        // We still release so the user isn't stuck behind the overlay.
+      } finally {
+        await tm.releaseInitialHold();
+      }
+    })();
+  </script>
 </body>
 
 </html>

@@ -12,6 +12,8 @@
      * @param {number} [options.zIndex=2147483647]
      * @param {boolean} [options.respectReducedMotion=true]
      * @param {string} [options.sessionKey='__tm_pending_out__']
+     * @param {boolean} [options.initialHold=false]        - if true, do NOT auto-run B→C on load
+     * @param {number} [options.initialHoldTimeoutMs=6000] - failsafe to avoid stuck overlay
      */
     constructor({
       overlay,
@@ -22,7 +24,9 @@
       easing = 'cubic-bezier(0.22, 1, 0.36, 1)',
       zIndex = 2147483647,
       respectReducedMotion = true,
-      sessionKey = '__tm_pending_out__'
+      sessionKey = '__tm_pending_out__',
+      initialHold = false,
+      initialHoldTimeoutMs = 6000,
     } = {}) {
       this.overlay = overlay || document.querySelector(overlaySelector || '');
       if (!this.overlay) throw new Error('TransitionManager: overlay element not found. Provide overlay or overlaySelector.');
@@ -35,17 +39,27 @@
       this.respectReducedMotion = respectReducedMotion;
 
       this._isAnimating = false;
+      this._initialHeld = !!initialHold;
+      this._initialHoldTimer = null;
+      this._initialHoldTimeoutMs = initialHoldTimeoutMs;
 
       this._setupOverlayStyles();
       this._installResizeHandler();
       this._installLifecycleHandlers();
 
-      // On classic loads, play B→C (then park at A).
-      // On bfcache restores, pageshow handler (below) will handle it.
-      queueMicrotask(() => this._animateOutThenHide());
+      if (this._initialHeld) {
+        // Failsafe: never let the overlay stay forever if something goes wrong.
+        this._initialHoldTimer = setTimeout(() => {
+          if (this._initialHeld) this.releaseInitialHold();
+        }, Math.max(0, this._initialHoldTimeoutMs));
+      } else {
+        // On classic loads, play B→C (then park at A).
+        // On bfcache restores, pageshow handler will handle it.
+        queueMicrotask(() => this._animateOutThenHide());
+      }
     }
 
-    /** Navigate with transition (A→B, optional buffer, then navigate) */
+    /** Public: navigate with transition (A→B, optional buffer, then navigate) */
     async transitionTo(url) {
       if (this._isAnimating) return false;
 
@@ -58,7 +72,6 @@
       try {
         await this._animateInToCover(); // A → B
         if (this.bufferTime > 0) await this._wait(this.bufferTime);
-        // Mark that the *next* page should run B→C on show (helps reloads & some restores).
         sessionStorage.setItem(this.sessionKey, '1');
         window.location.assign(url);
       } finally {
@@ -67,7 +80,18 @@
       return false;
     }
 
-    /** Helper for inline onclick on anchors */
+    /** Public: called by app when initial batch is ready; runs B→C now. */
+    async releaseInitialHold() {
+      if (!this._initialHeld) return;
+      this._initialHeld = false;
+      if (this._initialHoldTimer) {
+        clearTimeout(this._initialHoldTimer);
+        this._initialHoldTimer = null;
+      }
+      await this._animateOutThenHide();
+    }
+
+    /** Helper for inline onclick on anchors. */
     handleLinkClick(e, anchor) {
       if (!anchor || !anchor.href) return true;
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || anchor.target === '_blank') return true;
@@ -93,7 +117,6 @@
 
       if (this.transitionEffect === 'slide') {
         el.style.setProperty('will-change', 'transform', 'important');
-        // Author can start with B coverage in HTML; we won't override here.
       } else {
         el.style.setProperty('will-change', 'opacity', 'important');
         if (!el.style.opacity) el.style.opacity = '1';
@@ -111,35 +134,27 @@
     }
 
     _installLifecycleHandlers() {
-      // When the page is shown (including bfcache restore), ensure B→C runs if needed.
       window.addEventListener('pageshow', (e) => {
         const pending = sessionStorage.getItem(this.sessionKey) === '1';
-        // If restored from bfcache or we flagged a pending-out, run the hide sequence.
         if (e.persisted || pending) {
           this._animateOutThenHide().finally(() => {
             sessionStorage.removeItem(this.sessionKey);
           });
-        } else {
-          // On normal shows, make sure we're safely parked.
+        } else if (!this._initialHeld) {
           this._parkAtAAndHide();
         }
       });
 
-      // If the page is being hidden (bfcache candidate), cancel any running animations to avoid stuck states.
       window.addEventListener('pagehide', () => {
         try { this.overlay.getAnimations().forEach(a => a.cancel()); } catch (_) {}
       });
 
-      // History traversal (some browsers fire popstate on restore). Belt-and-suspenders:
       window.addEventListener('popstate', () => {
-        // If the overlay is visible (e.g., at B), ensure we clear it quickly.
         requestAnimationFrame(() => this._parkAtAAndHide());
       });
 
-      // As an extra guard, if the tab becomes visible again mid-animation, ensure we finish hiding.
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') {
-          // If we ever got stuck half-way, finish the hide.
+        if (document.visibilityState === 'visible' && !this._initialHeld) {
           this._hideAtC();
           requestAnimationFrame(() => this._parkAtAAndHide());
         }
@@ -158,7 +173,7 @@
         el.style.visibility = 'hidden';
         el.style.transform = 'translateX(-100%)'; // A
       } else {
-        el.style.opacity = '0'; // A
+        el.style.opacity = '0';
         el.style.visibility = 'hidden';
       }
     }

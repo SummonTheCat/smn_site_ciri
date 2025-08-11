@@ -24,37 +24,58 @@
 </head>
 
 <body>
-  <!-- Page transition overlay: starts visible so B→C plays on load -->
-  <div id="page-transition-overlay" style="background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
+  <!-- Transition overlay starts visible so B→C runs after initial batch -->
+  <div id="page-transition-overlay"
+       style="background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
               width:100vw; height:100vh; opacity:1; will-change:opacity; visibility:visible;">
   </div>
 
-  <!-- Background slot (will be filled by background component) -->
+  <!-- Slots -->
   <div id="background-slot"></div>
-
-  <!-- Header slot (component will render here) -->
-  <div id="header-slot">Loading header…</div>
-
-  <!-- Under construction slot (component will render here) -->
-  <div id="under-construction">Loading under construction message…</div>
+  <div id="header-slot"></div>
+  <div id="under-construction"></div>
 
   <!-- Scripts -->
   <script src="scripts/transitionManager.js"></script>
   <script src="scripts/componentManager.js"></script>
   <script>
-    // Make tm global for inline onclick handlers
+    // 0) Fire-and-forget any non-critical components IMMEDIATELY.
+    //    This does NOT await, so it cannot be delayed by the initial batch or the transition.
+    void applyComponent('#under-construction', 'underConstruction', []);
+
+    // 1) Create TransitionManager with an initial hold so we control when the overlay leaves.
     window.tm = new TransitionManager({
       overlaySelector: '#page-transition-overlay',
       duration: 300,
       bufferTime: 30,
-      transitionEffect: 'fade'
+      transitionEffect: 'fade',
+      initialHold: true,          // don't auto-run B→C yet
+      initialHoldTimeoutMs: 8000, // failsafe
     });
 
-    // Apply components
-    applyComponent('#header-slot', 'header', 'Technical Art');
-    applyComponent('#under-construction', 'underConstruction', []);
-    applyComponent('#background-slot', 'background', []);
+    // 2) Define the initial batch that MUST be present before revealing the page.
+    const initialBatch = [
+      { target: '#header-slot',     name: 'header',     args: ['Technical Art'] },
+      { target: '#background-slot', name: 'background', args: [] },
+    ];
+
+    // 3) Kick off the batch and release the hold when (only) the batch is done.
+    //    This awaits JUST the batch (not underConstruction), so the overlay leaves as soon as the
+    //    critical components are ready, while lazy stuff continues loading independently.
+    (async () => {
+      try {
+        await applyComponentsGroup(initialBatch, {
+          onProgress(i, total) {
+            // optional: console.log(`[batch] ${i}/${total}`);
+          }
+        });
+      } catch (e) {
+        console.error('Initial batch failed:', e);
+        // We still release so the user isn't stuck behind the overlay.
+      } finally {
+        await tm.releaseInitialHold();
+      }
+    })();
   </script>
 </body>
-
 </html>
