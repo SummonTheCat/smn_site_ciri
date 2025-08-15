@@ -1,0 +1,19 @@
+{
+    "project_name": "SmnPlace: Fixer",
+    "project_description": "Game about fixing and improving places.",
+    "project_state": "Complete",
+    "project_tools": ["Blender", "Photoshop", "Unity"],
+    "project_images": ["/graphics/test/image1.png", "/graphics/test/image2.png", "/graphics/test/image3.png"],
+    "project_videos": ["https://www.w3schools.com/html/mov_bbb.mp4", "https://www.w3schools.com/html/mov_bbb.mp4"],
+    "project_content": "smn_place_fixer.md",
+    "project_links": [
+        {
+            "link": "https://example.com",
+            "description": "Example Website"
+        },
+        {
+            "link": "https://example.org",
+            "description": "Example Organization"
+        }
+    ]
+}

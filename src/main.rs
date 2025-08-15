@@ -12,6 +12,8 @@ async fn main() {
 
     components.register_simple("./components/underConstruction.html");
 
+
+    manager.apply_plugin(Box::new(plugins::plugin_showcase::PluginShowcase::new()));
     manager.apply_plugin(Box::new(components));
     manager.apply_plugin(Box::new(PluginStatic::new(true, vec!["html".to_string(), "pdf".to_string(), "svg".to_string()])));
     manager.init_plugins().await;

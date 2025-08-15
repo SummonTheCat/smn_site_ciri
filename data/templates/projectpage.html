@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>{{TITLE}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Base styles (do not modify) -->
+  <link rel="stylesheet" href="/styles/styles-base.css" />
+  <link rel="stylesheet" href="/styles/styles-elements.css" />
+  <link rel="stylesheet" href="/styles/styles-mobile.css" />
+
+  <!-- Template-scoped additions that only use base variables -->
+  <style>
+    /* Template-scoped additions that only use base variables */
+
+    /* Thinner sidebar for this template */
+    :root {
+      --size-panel-left: 240px;
+      /* was 300px */
+    }
+
+    /* ---- Layout wrappers ---- */
+    .root {
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: fixed;
+      z-index: 10;
+      top: 0;
+      left: 0;
+      width: var(--size-panel-left);
+      height: 100vh;
+      overflow: auto;
+      /* internal scrolling only */
+      background: var(--color-accent-02);
+      border-right: 1px solid var(--color-secondary-02);
+      box-sizing: border-box;
+      color: var(--color-primary-01);
+    }
+
+    .content {
+      margin-left: var(--size-panel-left);
+      min-height: 100vh;
+      box-sizing: border-box;
+      padding: var(--buffer-small);
+      color: var(--color-primary-01);
+    }
+
+    .content-wrapper {
+      max-width: var(--content-width-max);
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+      background: var(--color-accent-03);
+      padding: var(--buffer-medium);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-generic);
+      border: 1px solid var(--color-secondary-02);
+    }
+
+    /* ---- Sidebar tree ---- */
+    .sidebar-nav {
+      max-height: 100%;
+      overflow: auto;
+    }
+
+    .project-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .level-0 {
+      font-weight: bold;
+    }
+
+    .level-1 {
+      font-weight: normal;
+    }
+
+    .project-list .project-list {
+      padding-left: var(--buffer-medium);
+    }
+
+    .project-node {
+      margin: var(--buffer-tiny) 0;
+    }
+
+    /* Full-row clickable link */
+    .project-link {
+      display: block;
+      /* take full row */
+      width: 100%;
+      padding: var(--buffer-small) var(--buffer-medium);
+      color: var(--color-primary-01);
+      text-decoration: none;
+      transition:
+        background var(--transition-speed),
+        color var(--transition-speed),
+        box-shadow var(--transition-speed);
+      list-style: none;
+      margin: 0;
+    }
+
+    /* Hover highlights entire row */
+    .project-link:hover {
+      background: var(--color-accent-01);
+      /* left accent bar */
+    }
+
+    /* Selected row */
+    .project-link.selected {
+      color: var(--color-primary-03);
+    }
+
+    /* Keyboard focus visibility */
+    .project-link:focus-visible {
+      outline: none;
+    }
+
+    /* ---- Content sections ---- */
+    .project-title {
+      margin: 0 0 var(--buffer-small) 0;
+    }
+
+    .project-description {
+      color: var(--color-secondary-01);
+      margin: 0 0 var(--buffer-small) 0;
+    }
+
+    .section-title {
+      margin-bottom: var(--buffer-small);
+    }
+
+    /* State box */
+    .state-box {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--buffer-small);
+      padding: 6px 10px;
+      border: 1px solid var(--color-secondary-02);
+      border-radius: var(--border-radius);
+      background: var(--color-accent-01);
+      font-weight: 600;
+      margin: var(--buffer-small) 0 var(--buffer-large);
+      box-shadow: var(--shadow-generic);
+    }
+
+    .state-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--color-primary-02);
+      display: inline-block;
+    }
+
+    .project-state .label {
+      color: var(--color-secondary-01);
+    }
+
+    /* Media rows (videos/images share row width) */
+    .video-grid,
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--buffer-medium);
+      margin-bottom: var(--buffer-small);
+    }
+
+    .image-grid {
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    .video-item,
+    .image-item {
+      width: 100%;
+      height: auto;
+      display: block;
+      background: var(--color-accent-02);
+      border: 1px solid var(--color-secondary-02);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-generic);
+    }
+
+    /* ---- Markdown (renderer outputs .md and child classes) ---- */
+    .md {
+      line-height: 1.6;
+    }
+
+    .md .md-h1,
+    .md .md-h2,
+    .md .md-h3,
+    .md .md-h4 {
+      margin: var(--buffer-large) 0 var(--buffer-small);
+    }
+
+    .md .md-p {
+      margin: var(--buffer-small) 0;
+    }
+
+    .md .md-code-inline {
+      background: var(--color-accent-02);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--color-secondary-02);
+    }
+
+    .md .md-pre {
+      background: var(--color-accent-02);
+      border: 1px solid var(--color-secondary-02);
+      border-radius: var(--border-radius);
+      padding: var(--buffer-medium);
+      overflow: auto;
+      box-shadow: var(--shadow-generic);
+    }
+
+    .md .md-a {
+      color: var(--color-primary-02);
+      text-decoration: dotted underline;
+    }
+
+    .md .md-a:hover {
+      color: var(--color-primary-01);
+    }
+
+    .md-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .md-table td,
+    .md-table th {
+      border: 1px solid var(--color-secondary-02);
+      padding: 6px 8px;
+    }
+
+    /* ---- Tools & Links two-column meta grid ---- */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--buffer-medium);
+      margin-top: var(--buffer-large);
+    }
+
+    .meta-card {
+      background: var(--color-accent-01);
+      border: 1px solid var(--color-secondary-02);
+      border-radius: var(--border-radius);
+      padding: var(--buffer-medium);
+      box-shadow: var(--shadow-generic);
+    }
+
+    .mini-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    .mini-table tr+tr td {
+      border-top: 1px solid var(--color-secondary-02);
+    }
+
+    .mini-table td {
+      padding: 8px 10px;
+      vertical-align: top;
+    }
+
+    .mini-table .cell-key {
+      width: 30%;
+      color: var(--color-secondary-01);
+    }
+
+    .mini-table .cell-value {
+      width: 70%;
+    }
+
+    /* ---- Generic lists (site-wide content lists) ---- */
+    ul,
+    ol {
+      margin: var(--buffer-medium) 0;
+      padding-left: var(--buffer-large);
+      color: var(--color-primary-01);
+    }
+
+    .list-unstyled {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    .list-inline {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--buffer-small);
+    }
+
+    li {
+      margin-bottom: var(--buffer-tiny);
+    }
+
+    li::marker {
+      color: var(--color-primary-02);
+    }
+
+    dl {
+      margin: var(--buffer-medium) 0;
+    }
+
+    dt {
+      font-weight: bold;
+      margin-top: var(--buffer-small);
+    }
+
+    dd {
+      margin: 0 0 var(--buffer-small) var(--buffer-medium);
+      color: var(--color-secondary-02);
+    }
+
+    /* ---- Utilities ---- */
+    .spacer {
+      width: var(--buffer-small);
+      height: var(--buffer-small);
+    }
+  </style>
+
+</head>
+
+<body>
+  <!-- Transition overlay starts visible so we can delay B→C until the initial batch is ready -->
+  <div id="page-transition-overlay" style="
+        background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
+        width:100vw; height:100vh; opacity:1; will-change:opacity; visibility:visible;">
+  </div>
+
+  <!-- Background Image -->
+  <img class="blur-01 fullscreen darken-01" alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high"
+    src="/graphics/bkg/wp3.jpg">
+  <div class="root">
+    <div class="sidebar">
+      <div>
+        <div class="space-small"></div>
+        <div class="flex-row">
+          <div class="space-small"></div>
+          <h2>Projects Overview</h2>
+          <div class="space-small"></div>
+        </div>
+        <div class="space-medium"></div>
+      </div>
+      {{SIDEBAR}}
+    </div>
+
+    <div class="content">
+      <div class="content-wrapper">
+        {{CONTENT}}
+      </div>
+    </div>
+  </div>
+</body>
+
+<!-- Scripts -->
+<script src="/scripts/transitionManager.js"></script>
+<script src="/scripts/componentManager.js"></script>
+<script src="/scripts/linkReplacer.js"></script>
+<script>
+  // 0) Fire any non-critical stuff immediately (no coupling to transition)
+  initContactLinks('#contact-email, #contact-discord');
+
+  // 1) Create TransitionManager with an initial hold so we control when the overlay leaves.
+  window.tm = new TransitionManager({
+    overlaySelector: '#page-transition-overlay',
+    duration: 300,
+    bufferTime: 30,
+    transitionEffect: 'fade',
+    initialHold: false,          // don't auto-run B→C yet
+    initialHoldTimeoutMs: 8000, // failsafe so it never sticks
+  });
+</script>
+
+</html>

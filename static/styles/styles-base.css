@@ -11,6 +11,7 @@
     --color-accent-01: #242424;
     --color-accent-02: #131313;
     --color-accent-03: #0d0d11;
+    --color-accent-04: #385cb1;
     --color-status-success: #78e878;
     --color-status-error: #b44a4a;
 
@@ -108,7 +109,13 @@ a:hover {
 }
 
 a:active {
-    color: var(--color-primary-03);
+    color: var(--color-primary-01);
+}
+
+ul, ol {
+    margin: var(--buffer-medium) 0;
+    padding-left: var(--buffer-large);
+    color: var(--color-primary-01);
 }
 
 button {

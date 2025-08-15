@@ -1,0 +1,20 @@
+{
+    "project_tree": [
+        {
+            "name": "Game Design",
+            "path": "/projects/game_design",
+            "children": [
+                {
+                    "name": "SmnPlace: Fixer",
+                    "path": "/projects/game_design/smn_place_fixer",
+                    "children": []
+                },
+                {
+                    "name": "Alchemist's Convoy",
+                    "path": "/projects/game_design/alchemists_convoy",
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

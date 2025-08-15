@@ -1,0 +1,11 @@
+{
+    "project_name": "Game Design",
+    "project_description": "This project focuses on the design of game environments and characters.",
+    "project_state": "",
+    "project_tools": [],
+    "project_images": ["/graphics/test/image1.png", "/graphics/test/image2.png", "/graphics/test/image3.png"],
+    "project_videos": [],
+    "project_content": "game_design.md",
+    "project_links": [
+    ]
+}
