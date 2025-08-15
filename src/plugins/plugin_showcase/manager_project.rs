@@ -69,7 +69,6 @@ pub fn get_project_info<P: AsRef<Path>>(base_data_dir: P, url_relative: &str) ->
 
     for name in candidates {
         let p = proj_dir.join(name);
-        println!("Checking for project info at: {}", p.display());
         if p.is_file() {
             let file = File::open(&p)?;
             let reader = BufReader::new(file);
@@ -97,7 +96,6 @@ pub fn load_markdown_content<P: AsRef<Path>>(
     }
     let proj_dir = project_dir_for(base_data_dir, url_relative);
     let path = proj_dir.join(md_rel_path);
-    println!("Loading markdown content from: {}", path.display());
     let content = std::fs::read_to_string(path)?;
     Ok(content)
 }

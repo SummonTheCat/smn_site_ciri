@@ -45,3 +45,8 @@ All referenced media files live in the project’s `resources/` directory and ar
 - **Deformations:** Dual Quaternion with corrective shapes
 - **Controls:** World/Root, COG, FK/IK limbs, foot roll, twist bones
 - **Export:** Deform-only skeleton + baked curves, 30 FPS
+
+---
+
+## Directory Layout
+

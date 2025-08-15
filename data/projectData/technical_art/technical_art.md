@@ -25,20 +25,6 @@ All referenced media files live in the project’s `resources/` directory and ar
 - Engine: **Unity 2022 LTS**
 - Scripting: **Python**, **Rust** (pipeline helpers)
 
----
-
-## Gallery
-
-> Images are relative to this page and will be served from `.../resources/`.
-
-![Concept Sculpt](concept_01.png)
-![Joint Layout](rig_layout.png)
-
-**Video Demo:**  
-[blockout_walkthrough.mp4](blockout_walkthrough.mp4)
-
----
-
 ## Rig Specs
 
 - **Skeleton:** 76 deform joints, FK/IK spine, switchable arms/legs

@@ -47,6 +47,17 @@ impl Plugin for PluginShowcase {
         let path = req.uri().path().to_string(); // e.g. "/projects/game_design/alchemists_convoy"
         let rel_full = strip_projects_prefix(&path).trim_matches('/'); // "game_design/alchemists_convoy" or ""
 
+        // If ends in any extension, this is invalid and we should return 404
+        if rel_full.contains('.') {
+            return Ok(Response::builder()
+                .status(StatusCode::NOT_FOUND)
+                .body(Body::from("Not Found"))
+                .unwrap());
+        }
+        
+        // Log what project is being accessed
+        println!("User generating project project: {}", rel_full);
+
         // Get the project structure
         if rel_full.is_empty() {
             let project_structure =
