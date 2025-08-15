@@ -11,7 +11,7 @@ pub fn generate_project_list_html(
 ) -> String {
     let template = load_template();
     let sidebar = render_sidebar_html(project_structure, req_path, path_relative);
-    let content = String::new();
+    let content = String::new(); // empty for /projects root
     let title = "Projects";
     apply_template(&template, title, &sidebar, &content)
 }
@@ -98,10 +98,7 @@ pub fn generate_project_page_html(
             content.push_str(r#"<table class="mini-table"><tbody>"#);
             for t in &info.project_tools {
                 content.push_str(r#"<tr>"#);
-                content.push_str(&format!(
-                    r#"<td class="cell-value">{}</td>"#,
-                    html_escape(t)
-                ));
+                content.push_str(&format!(r#"<td class="cell-value">{}</td>"#, html_escape(t)));
                 content.push_str(r#"</tr>"#);
             }
             content.push_str(r#"</tbody></table></div>"#);
@@ -127,7 +124,11 @@ pub fn generate_project_page_html(
         content.push_str("</section>");
     }
 
-    apply_template(&template, &info.project_name, &sidebar, &content)
+    // ✅ Always wrap the assembled content exactly once,
+    // regardless of whether tools/links existed.
+    let content_wrapped = format!(r#"<div class="content-wrapper">{}</div>"#, content);
+
+    apply_template(&template, &info.project_name, &sidebar, &content_wrapped)
 }
 
 // ------------- helpers -------------

@@ -4,8 +4,18 @@
 <head>
   <meta charset="utf-8">
   <title>{{TITLE}}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Funnel+Display:wght@300..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Lexend:wght@100..900&family=Mozilla+Headline:wght@200..700&display=swap"
+    rel="stylesheet">
   <!-- Base styles (do not modify) -->
   <link rel="stylesheet" href="/styles/styles-base.css" />
   <link rel="stylesheet" href="/styles/styles-elements.css" />
@@ -35,7 +45,7 @@
       height: 100vh;
       overflow: auto;
       /* internal scrolling only */
-      background: var(--color-accent-02);
+      background: var(--color-accent-04);
       border-right: 1px solid var(--color-secondary-02);
       box-sizing: border-box;
       color: var(--color-primary-01);
@@ -50,11 +60,10 @@
     }
 
     .content-wrapper {
-      max-width: var(--content-width-max);
+      width: var(--content-width-max);
       margin-left: auto;
       margin-right: auto;
-      width: 100%;
-      background: var(--color-accent-03);
+      background: var(--color-accent-04);
       padding: var(--buffer-medium);
       border-radius: var(--border-radius);
       box-shadow: var(--shadow-generic);
@@ -332,54 +341,160 @@
 </head>
 
 <body>
+
+  <label for="nav-toggle" class="mobile-topbar" aria-controls="sidebar" aria-expanded="false">
+    <button class="mobile-topbar__btn" type="button" aria-hidden="true">☰ Menu</button>
+    <span class="mobile-topbar__title">Projects</span>
+  </label>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle" hidden>
+
   <!-- Transition overlay starts visible so we can delay B→C until the initial batch is ready -->
   <div id="page-transition-overlay" style="
         background:#111; position:fixed; inset:0; z-index:2147483647; pointer-events:none;
         width:100vw; height:100vh; opacity:1; will-change:opacity; visibility:visible;">
+
   </div>
 
   <!-- Background Image -->
   <img class="blur-01 fullscreen darken-01" alt="" aria-hidden="true" sizes="100vw" loading="eager" fetchpriority="high"
     src="/graphics/bkg/wp3.jpg">
-  <div class="root">
-    <div class="sidebar">
-      <div>
-        <div class="space-small"></div>
+
+  <!-- Header -->
+  <header class="flex-row nav-buttons">
+    <h1>
+      <a href="/" onclick="return tm.handleLinkClick(event, this)">Julien Liakos</a>
+    </h1>
+  </header>
+
+
+
+  <main class="flex-center flex-grow">
+
+    <div class="root">
+      <div class="sidebar">
+        <div class="space-medium"></div>
         <div class="flex-row">
-          <div class="space-small"></div>
-          <h2>Projects Overview</h2>
-          <div class="space-small"></div>
+          <div class="space-medium"></div>
+          <h1>
+            <a href="/" onclick="return tm.handleLinkClick(event, this)">Julien Liakos</a>
+          </h1>
         </div>
         <div class="space-medium"></div>
+        {{SIDEBAR}}
       </div>
-      {{SIDEBAR}}
-    </div>
 
-    <div class="content">
-      <div class="content-wrapper">
+      <div class="content">
         {{CONTENT}}
       </div>
     </div>
-  </div>
+  </main>
+
 </body>
 
 <!-- Scripts -->
 <script src="/scripts/transitionManager.js"></script>
 <script src="/scripts/componentManager.js"></script>
-<script src="/scripts/linkReplacer.js"></script>
 <script>
-  // 0) Fire any non-critical stuff immediately (no coupling to transition)
-  initContactLinks('#contact-email, #contact-discord');
-
   // 1) Create TransitionManager with an initial hold so we control when the overlay leaves.
   window.tm = new TransitionManager({
     overlaySelector: '#page-transition-overlay',
-    duration: 300,
-    bufferTime: 30,
+    duration: 500,
+    bufferTime: 500,
     transitionEffect: 'fade',
     initialHold: false,          // don't auto-run B→C yet
-    initialHoldTimeoutMs: 8000, // failsafe so it never sticks
+    initialHoldTimeoutMs: 1000, // failsafe so it never sticks
   });
+</script>
+<script>
+  (function () {
+    const body = document.body;
+    const checkbox = document.getElementById('nav-toggle');
+    const topbar = document.querySelector('.mobile-topbar');
+    const topbarBtn = document.querySelector('.mobile-topbar__btn');
+    const scrim = document.querySelector('.mobile-scrim');
+    const sidebar = document.querySelector('.sidebar');
+
+    // Ensure sidebar has an id that matches aria-controls (for a11y)
+    if (sidebar && !sidebar.id) sidebar.id = 'sidebar';
+    if (topbar && !topbar.getAttribute('aria-controls')) {
+      topbar.setAttribute('aria-controls', sidebar ? sidebar.id : 'sidebar');
+    }
+
+    function setSidebarOpen(open) {
+      body.classList.toggle('sidebar-open', !!open);
+      if (checkbox) checkbox.checked = !!open;
+      if (topbar) topbar.setAttribute('aria-expanded', String(!!open));
+      if (sidebar) sidebar.setAttribute('aria-hidden', String(!open));
+      if (scrim) {
+        scrim.style.pointerEvents = open ? 'auto' : 'none';
+      }
+
+      // set the open class on the sidebar
+      if (sidebar) sidebar.classList.toggle('open', !!open);
+    }
+
+    function toggleSidebar() {
+      setSidebarOpen(!body.classList.contains('sidebar-open'));
+    }
+
+    // Sync when the checkbox changes (CSS-only fallback still works)
+    if (checkbox) {
+      checkbox.addEventListener('change', () => setSidebarOpen(checkbox.checked));
+    }
+
+    // Topbar button explicitly toggles (prevent label default double-toggle)
+    if (topbarBtn) {
+      topbarBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleSidebar();
+      });
+    }
+
+    // Scrim closes
+    if (scrim) {
+      scrim.addEventListener('click', (e) => {
+        e.preventDefault();
+        setSidebarOpen(false);
+      });
+    }
+
+    // Close on ESC
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') setSidebarOpen(false);
+    });
+
+    // Close when clicking any link inside the sidebar (let tm handle nav)
+    if (sidebar) {
+      sidebar.addEventListener('click', (e) => {
+        const a = e.target.closest('a');
+        if (!a) return;
+        // if opening in new tab or modified click, leave drawer state alone
+        if (a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        setSidebarOpen(false);
+      });
+    }
+
+    // Reset when going back to desktop layout
+    const mq = window.matchMedia('(min-width: 1025px)');
+    function handleBPChange() {
+      if (mq.matches) setSidebarOpen(false);
+    }
+    if (mq.addEventListener) mq.addEventListener('change', handleBPChange);
+    else mq.addListener(handleBPChange); // Safari <14
+    handleBPChange();
+
+    // Ensure drawer closes before any TransitionManager navigation
+    if (window.tm && typeof window.tm.transitionTo === 'function') {
+      const originalTransitionTo = window.tm.transitionTo.bind(window.tm);
+      window.tm.transitionTo = function (url) {
+        setSidebarOpen(false);
+        return originalTransitionTo(url);
+      };
+    }
+
+    // Initial state
+    setSidebarOpen(false);
+  })();
 </script>
 
 </html>

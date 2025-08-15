@@ -3,6 +3,7 @@ header {
     border-radius: var(--border-radius);
     border: 2px solid var(--color-accent-01);
     padding: var(--buffer-small) var(--buffer-medium);
+    z-index: 1000;
 }
 
 .msg-box {

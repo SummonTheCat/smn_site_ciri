@@ -3,7 +3,7 @@
     "project_description": "Game about alchemy and potion crafting.",
     "project_state": "In Progress",
     "project_tools": ["Blender", "Photoshop", "Unity"],
-    "project_images": ["/graphics/test/image1.png", "/graphics/test/image2.png", "/graphics/test/image3.png"],
+    "project_images": ["/graphics/test/image1.jpg", "/graphics/test/image2.jpg", "/graphics/test/image3.jpg"],
     "project_videos": ["https://www.w3schools.com/html/mov_bbb.mp4"],
     "project_content": "alchemists_convoy.md",
     "project_links": [

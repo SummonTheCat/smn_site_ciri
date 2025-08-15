@@ -1,4 +1,4 @@
-use pulldown_cmark::{CodeBlockKind, CowStr, Event, Options, Parser, Tag};
+use pulldown_cmark::{CodeBlockKind, Event, Options, Parser, Tag};
 use std::fmt::Write as _;
 
 /// Convert Markdown to HTML wrapped with classes for styling:
@@ -120,7 +120,7 @@ fn start_tag(tag: Tag, out: &mut String) {
             out.push_str(rel);
             out.push('>');
         }
-        Tag::Image { link_type: _lt, title, dest_url, id } => {
+        Tag::Image { link_type: _lt, title, dest_url, id: _ } => {
             out.push_str(r#"<img class="md-img" src=""#);
             attr_escape_to(out, &dest_url);
             out.push('"');

@@ -1,10 +1,10 @@
 {
-    "project_name": "Game Design",
-    "project_description": "This project focuses on the design of game environments and characters.",
+    "project_name": "Technical Art",
+    "project_description": "This project focuses on technical art.",
     "project_state": "",
     "project_tools": [],
     "project_images": ["/graphics/test/image1.jpg", "/graphics/test/image2.jpg", "/graphics/test/image3.jpg"],
     "project_videos": [],
-    "project_content": "game_design.md",
+    "project_content": "technical_art.md",
     "project_links": []
 }

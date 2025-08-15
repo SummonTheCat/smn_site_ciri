@@ -1,15 +1,16 @@
 use async_trait::async_trait;
 use hyper::{
     Body, Request, Response, StatusCode,
-    header::{CONTENT_TYPE, HeaderValue},
+    header::HeaderValue,
 };
 use smn_web_core::structs::struct_plugin::Plugin;
-use std::{convert::Infallible, path::Path};
-use tokio::fs;
+use std::{convert::Infallible};
 
 mod html_builder;
 mod html_markdown;
+#[allow(unused)]
 mod manager_list;
+#[allow(unused)]
 mod manager_project;
 
 // ---------------------- Plugin ----------------------
@@ -46,7 +47,7 @@ impl Plugin for PluginShowcase {
         let path = req.uri().path().to_string(); // e.g. "/projects/game_design/alchemists_convoy"
         let rel_full = strip_projects_prefix(&path).trim_matches('/'); // "game_design/alchemists_convoy" or ""
 
-        // 1) Root list page: sidebar + empty content
+        // Get the project structure
         if rel_full.is_empty() {
             let project_structure =
                 match manager_list::get_project_structure("data/displayProjectList.json") {
@@ -165,12 +166,8 @@ impl Plugin for PluginShowcase {
     }
 }
 
-// ========== UTILITIES (kept in plugin, builder has its own) ==========
+// ========== UTILITIES  ==========
 
-/// Find the deepest (longest path) project whose `.path` is a prefix of the request path.
-/// Accepts either exact match or prefix with a trailing slash:
-///   - req == node.path
-///   - req starts_with(node.path + "/")
 fn find_longest_matching_project<'a>(
     structure: &'a manager_list::ProjectStructure,
     req_path: &str,
@@ -196,27 +193,4 @@ fn find_longest_matching_project<'a>(
 
 fn strip_projects_prefix(p: &str) -> &str {
     p.strip_prefix("/projects").unwrap_or(p)
-}
-
-fn guess_mime(p: &Path) -> &'static str {
-    match p
-        .extension()
-        .and_then(|e| e.to_str())
-        .unwrap_or("")
-        .to_ascii_lowercase()
-        .as_str()
-    {
-        "png" => "image/png",
-        "jpg" | "jpeg" => "image/jpeg",
-        "gif" => "image/gif",
-        "webp" => "image/webp",
-        "svg" => "image/svg+xml",
-        "mp4" => "video/mp4",
-        "webm" => "video/webm",
-        "mp3" => "audio/mpeg",
-        "wav" => "audio/wav",
-        "md" => "text/markdown; charset=utf-8",
-        "txt" => "text/plain; charset=utf-8",
-        _ => "application/octet-stream",
-    }
 }

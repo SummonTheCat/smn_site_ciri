@@ -15,6 +15,16 @@
                     "children": []
                 }
             ]
+        },
+        {
+            "name": "Development",
+            "path": "/projects/development",
+            "children": []
+        },
+        {
+            "name": "Technical Art",
+            "path": "/projects/technical_art",
+            "children": []
         }
     ]
 }

@@ -11,7 +11,7 @@
     --color-accent-01: #242424;
     --color-accent-02: #131313;
     --color-accent-03: #0d0d11;
-    --color-accent-04: #385cb1;
+    --color-accent-04: #1b1b1ce5;
     --color-status-success: #78e878;
     --color-status-error: #b44a4a;
 
@@ -24,7 +24,7 @@
     --font-size-large: 1.5em;
 
     /* Layout */
-    --content-width-max: 1000px;
+    --content-width-max: 1100px;
     --buffer-tiny: 0.25em;
     --buffer-small: 0.5em;
     --buffer-medium: 1em;

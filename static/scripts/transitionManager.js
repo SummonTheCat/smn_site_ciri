@@ -12,8 +12,8 @@
      * @param {number} [options.zIndex=2147483647]
      * @param {boolean} [options.respectReducedMotion=true]
      * @param {string} [options.sessionKey='__tm_pending_out__']
-     * @param {boolean} [options.initialHold=false]        - if true, do NOT auto-run B→C on load
-     * @param {number} [options.initialHoldTimeoutMs=6000] - failsafe to avoid stuck overlay
+     * @param {boolean} [options.initialHold=false]
+     * @param {number} [options.initialHoldTimeoutMs=6000]
      */
     constructor({
       overlay,
@@ -44,39 +44,55 @@
       this._initialHoldTimeoutMs = initialHoldTimeoutMs;
 
       this._setupOverlayStyles();
+
+      // ⛑ Ensure we start from a clean, known state (A, hidden)
+      this._stopAllAnimations();
+      this._parkAtAAndHide();
+
       this._installResizeHandler();
       this._installLifecycleHandlers();
 
       if (this._initialHeld) {
-        // Failsafe: never let the overlay stay forever if something goes wrong.
         this._initialHoldTimer = setTimeout(() => {
           if (this._initialHeld) this.releaseInitialHold();
         }, Math.max(0, this._initialHoldTimeoutMs));
       } else {
-        // On classic loads, play B→C (then park at A).
-        // On bfcache restores, pageshow handler will handle it.
         queueMicrotask(() => this._animateOutThenHide());
       }
     }
 
-    /** Public: navigate with transition (A→B, optional buffer, then navigate) */
+    /** Navigate with transition; robust against rapid repeated clicks. */
     async transitionTo(url) {
-      if (this._isAnimating) return false;
-
+      // Respect reduced motion
       if (this._shouldReduceMotion()) {
         window.location.assign(url);
         return false;
       }
 
-      this._isAnimating = true;
-      try {
-        await this._animateInToCover(); // A → B
-        if (this.bufferTime > 0) await this._wait(this.bufferTime);
-        sessionStorage.setItem(this.sessionKey, '1');
-        window.location.assign(url);
-      } finally {
-        this._isAnimating = false;
+      // If something is already animating (either in or out), cancel and FORCE to B
+      if (this._isAnimating) {
+        this._stopAllAnimations();
+        this._forceAtB(); // fully cover immediately
+      } else {
+        // Try to play A→B; if interrupted, we’ll force B below anyway.
+        this._isAnimating = true;
+        try {
+          await this._animateInToCover(); // A → B
+        } catch (_) {
+          this._forceAtB();
+        } finally {
+          this._isAnimating = false;
+        }
       }
+
+      // Optional buffer for aesthetics / async prep
+      if (this.bufferTime > 0) await this._wait(this.bufferTime);
+
+      // Mark for B→C on next page
+      sessionStorage.setItem(this.sessionKey, '1');
+
+      // Go
+      window.location.assign(url);
       return false;
     }
 
@@ -114,7 +130,6 @@
       for (const [k, v] of Object.entries(base)) {
         el.style.setProperty(k, v, 'important');
       }
-
       if (this.transitionEffect === 'slide') {
         el.style.setProperty('will-change', 'transform', 'important');
       } else {
@@ -134,9 +149,13 @@
     }
 
     _installLifecycleHandlers() {
+      // Enter: force any stray anim state and play B→C cleanly
       window.addEventListener('pageshow', (e) => {
         const pending = sessionStorage.getItem(this.sessionKey) === '1';
+        this._stopAllAnimations();           // 🔧 ensure no dangling anims
         if (e.persisted || pending) {
+          // Start from B, then go to C, then park at A
+          this._showAtB();
           this._animateOutThenHide().finally(() => {
             sessionStorage.removeItem(this.sessionKey);
           });
@@ -145,8 +164,9 @@
         }
       });
 
+      // Leave: cancel any anims to avoid jank
       window.addEventListener('pagehide', () => {
-        try { this.overlay.getAnimations().forEach(a => a.cancel()); } catch (_) {}
+        try { this.overlay.getAnimations().forEach(a => a.cancel()); } catch (_) { }
       });
 
       window.addEventListener('popstate', () => {
@@ -167,6 +187,25 @@
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     }
 
+    // ----- Forced states (used to “snap” when users click very fast) -----
+    _forceAtB() {
+      // Cancel any ongoing animation and snap to B
+      this._stopAllAnimations();
+      this._showAtB();
+    }
+    _forceAtA() {
+      this._stopAllAnimations();
+      this._parkAtAAndHide();
+    }
+    _forceAtC() {
+      this._stopAllAnimations();
+      this._hideAtC();
+    }
+    _stopAllAnimations() {
+      try { this.overlay.getAnimations().forEach(a => a.cancel()); } catch (_) { }
+    }
+
+    // ----- Named visual states -----
     _parkAtAAndHide() {
       const el = this.overlay;
       if (this.transitionEffect === 'slide') {
@@ -177,7 +216,6 @@
         el.style.visibility = 'hidden';
       }
     }
-
     _showAtB() {
       const el = this.overlay;
       el.style.visibility = 'visible';
@@ -187,7 +225,6 @@
         el.style.opacity = '1'; // B
       }
     }
-
     _hideAtC() {
       const el = this.overlay;
       if (this.transitionEffect === 'slide') {
@@ -206,14 +243,13 @@
         anim.addEventListener('cancel', () => reject(new Error('animation canceled')));
       });
     }
-
     _wait(ms) { return new Promise(res => setTimeout(res, ms)); }
 
     async _animateInToCover() {
       const el = this.overlay;
       el.style.visibility = 'visible';
-
       if (this.transitionEffect === 'slide') {
+        // Start from A → B
         el.style.transform = 'translateX(-100%)';
         await this._animate(
           el,
@@ -237,7 +273,8 @@
         return;
       }
 
-      // Ensure we're at B first
+      // If an out/in is in progress (e.g., quick clicks), cancel and start cleanly from B
+      this._stopAllAnimations();
       this._showAtB();
 
       if (this.bufferTime > 0) await this._wait(this.bufferTime);

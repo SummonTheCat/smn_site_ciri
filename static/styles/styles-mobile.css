@@ -159,3 +159,240 @@
     filter: blur(var(--blur-radius, 16px)) brightness(var(--darken-amount, 0.45));
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==========================================================================
+   Mobile Overrides & Topbar Drawer
+   Target file: /styles/styles-mobile.css
+   Relies only on variables defined in styles-base.css
+   ========================================================================== */
+
+/* ---------- Base tweaks that make sense on small screens ---------- */
+@media (max-width: 1024px) {
+  /* Sidebar becomes a top drawer */
+  .sidebar {
+    position: fixed;
+    top: var(--header-height, 56px);
+    left: 0;
+    right: 0;
+    width: 100vw;
+    height: calc(100vh - var(--header-height, 56px));
+    overflow: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-secondary-02);
+    background: var(--color-accent-02);
+    transform: translateY(-100%);
+    transition: transform var(--transition-speed) ease;
+    padding: var(--buffer-medium);
+  }
+
+  .sidebar.open {
+    transform: translateY(0) !important;  /* slide down when open */
+  }
+
+  /* Content no longer offset by desktop sidebar */
+  .content {
+    margin-left: 0;
+    padding: var(--buffer-medium);
+    min-height: 100vh;
+  }
+
+  .content-wrapper {
+    width: 100%;
+    max-width: var(--content-width-max);
+    margin: 0 auto;
+    border-radius: var(--border-radius);
+  }
+
+  /* Project list items: good tap targets */
+  .project-link {
+    padding: calc(var(--buffer-small) * 1.25) var(--buffer-medium);
+    border-radius: var(--border-radius);
+  }
+
+  /* Media grids: compress columns gracefully */
+  .video-grid,
+  .image-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--buffer-medium);
+  }
+}
+
+@media (max-width: 640px) {
+  .video-grid,
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-title {
+    margin-bottom: var(--buffer-small);
+  }
+}
+
+/* ---------- Mobile Top Bar (drawer handle) ---------- */
+/* Add this small bar to your template for mobile:
+    <label for="nav-toggle" class="mobile-topbar" aria-controls="sidebar" aria-expanded="false">
+      <button class="mobile-topbar__btn" type="button" aria-hidden="true">☰ Menu</button>
+      <span class="mobile-topbar__title">Projects</span>
+    </label>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle" hidden>
+    <label for="nav-toggle" class="mobile-scrim" aria-hidden="true"></label>
+   Or toggle `body.sidebar-open` from JS instead of using the checkbox.
+*/
+@media (max-width: 1024px) {
+  /* Hide any large desktop header if you want—adjust to your markup */
+  header.nav-buttons {
+    display: none;
+  }
+
+  .mobile-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--header-height, 56px);
+    display: flex;
+    align-items: center;
+    gap: var(--buffer-small);
+    padding: 0 var(--buffer-medium);
+    background: var(--color-accent-01);
+    border-bottom: 1px solid var(--color-secondary-02);
+    z-index: 40; /* above sidebar */
+    color: var(--color-primary-01);
+  }
+
+  .mobile-topbar__btn {
+    appearance: none;
+    margin: 0;
+    padding: 8px 12px;
+    background: var(--color-accent-02);
+    color: var(--color-primary-02);
+    border: var(--border-width) solid var(--color-secondary-02);
+    border-radius: var(--border-radius);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background var(--transition-speed), color var(--transition-speed), border-color var(--transition-speed);
+  }
+  .mobile-topbar__btn:hover {
+    background: var(--color-primary-02);
+    color: var(--color-accent-02);
+    border-color: var(--color-accent-02);
+  }
+
+  .mobile-topbar__title {
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-medium);
+    color: var(--color-primary-01);
+  }
+
+  /* Make room for the topbar */
+  .root {
+    padding-top: var(--header-height, 56px);
+  }
+}
+
+/* ---------- Force Hide Mobile Features on Desktop ---------- */
+@media (min-width: 1025px) {
+  .mobile-scrim {
+    display: none;
+  }
+  .mobile-topbar {
+    display: none;
+  }
+  .mobile-scrim {
+    display: none;
+  }
+}
+
+/* ---------- Open/Close Mechanics ---------- */
+/* Option A: JS toggles `body.sidebar-open` */
+@media (max-width: 1024px) {
+ 
+  body.sidebar-open .mobile-scrim {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .mobile-scrim {
+    position: fixed;
+    inset: var(--header-height, 56px) 0 0 0; /* below the topbar */
+    background: rgba(0,0,0,0.45);
+    z-index: 35;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-speed) ease;
+  }
+
+  .content-wrapper {
+    width: 100% !important; /* full width when sidebar is open */
+  }
+
+  .content {
+    width: 100% !important; /* full width when sidebar is open */
+    margin-left: 0 !important;
+
+  }
+
+  .sidebar {
+    z-index: 30; /* above content, below scrim */
+    width: 100vw !important; /* full width when sidebar is open */
+    height: 100vh !important; /* full height when sidebar is open */
+  }
+
+}
+
+/* Option B: Checkbox hack—no JS required */
+@media (max-width: 1024px) {
+  .nav-toggle:checked ~ .mobile-scrim {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+/* ---------- Nice-to-haves on touch screens ---------- */
+@media (hover: none) and (pointer: coarse) {
+  .project-link {
+    /* slightly larger hit area on touch */
+    padding: calc(var(--buffer-small) * 1.4) var(--buffer-medium);
+  }
+  .video-item,
+  .image-item {
+    border-radius: calc(var(--border-radius) * 1.25);
+  }
+}
+
+/* ---------- Safe area (notch) padding on iOS ---------- */
+@supports (padding: max(0px)) {
+  @media (max-width: 1024px) {
+    .mobile-topbar {
+      padding-left: max(var(--buffer-medium), env(safe-area-inset-left));
+      padding-right: max(var(--buffer-medium), env(safe-area-inset-right));
+      padding-top: max(0px, env(safe-area-inset-top));
+      height: calc(var(--header-height, 56px) + env(safe-area-inset-top));
+    }
+    .root {
+      padding-top: calc(var(--header-height, 56px) + env(safe-area-inset-top));
+    }
+    .sidebar {
+      height: calc(100vh - (var(--header-height, 56px) + env(safe-area-inset-top)));
+    }
+    .mobile-scrim {
+      inset: calc(var(--header-height, 56px) + env(safe-area-inset-top)) 0 0 0;
+    }
+  }
+}

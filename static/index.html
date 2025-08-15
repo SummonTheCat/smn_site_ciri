@@ -113,9 +113,9 @@
 
         // 1) Create TransitionManager with an initial hold so we control when the overlay leaves.
         window.tm = new TransitionManager({
-            overlaySelector: '#page-transition-overlay',
+            overlaySelector: '#page-transition-overlay', 
             duration: 300,
-            bufferTime: 30,
+            bufferTime: 500,
             transitionEffect: 'fade',
             initialHold: false,          // don't auto-run B→C yet
             initialHoldTimeoutMs: 8000, // failsafe so it never sticks
